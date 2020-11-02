@@ -2,29 +2,39 @@ import jade.core.Agent;
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
+import jade.proto.AchieveREInitiator;
 
-class RequestESBehaviour extends Behaviour {
+class RequestESBehaviour extends AchieveREInitiator {
     private int n = 0;
     ClientAgent client;
 
-    public RequestESBehaviour(ClientAgent client){
+    public RequestESBehaviour(ClientAgent client, ACLMessage msg) {
+        super(client, msg);
         this.client = client;
-    }
-    
-    public void action() {
-        AID[] scooterAgents = client.getYellowPagesService().getAgentList("electic-scooter");
-        System.out.println(scooterAgents);
-        if (scooterAgents != null) {
-            for (AID aid : scooterAgents) {
-               String[] args = {"my position", "100", "100"};
-               Utility.sendRequest(
-                       client, aid, (ACLMessage.REQUEST), "ask-for-scooter", Utility.arrayToString(args));
-                       System.out.println(++n + " I am doing something!");
-           }
+        // Request: GET-SCOOTER [Position]
+        String message = "GET-SCOOTER:" + this.client.getPosition().toString();
+        msg.setContent(message);
+        AID companyAgent = client.getYellowPagesService().getAgentList("company")[0];
+        System.out.println(companyAgent);
+        if (companyAgent != null) {
+            msg.addReceiver(companyAgent);
         }
-   }
+    }
 
-    public boolean done() {
-        return false;
+    protected void handleAgree(ACLMessage agree) {
+        // ...
+        System.out.println(agree.getContent());
+    }
+
+    protected void handleRefuse(ACLMessage refuse) {
+        // ...
+    }
+
+    protected void handleInform(ACLMessage inform) {
+        // ...
+    }
+
+    protected void handleFailure(ACLMessage failure) {
+        // ...
     }
 }
