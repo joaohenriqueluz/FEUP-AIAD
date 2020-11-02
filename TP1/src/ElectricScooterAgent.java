@@ -1,6 +1,8 @@
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+
 
 public class ElectricScooterAgent extends Agent {
 
@@ -8,6 +10,11 @@ public class ElectricScooterAgent extends Agent {
     private Integer range;
     private Position position;
     private YellowPagesService yellowPagesService;
+
+    public ElectricScooterAgent(String name, Position position){
+        scooterName = name;
+        this.position = position;
+    }
 
 	public String getScooterName() {
 		return this.scooterName;
@@ -35,48 +42,12 @@ public class ElectricScooterAgent extends Agent {
 
     public void setup() {
         // Register in Yellow Page service
-        yellowPagesService = new YellowPagesService(this, "electic-scooter", "scooterName");
+        yellowPagesService = new YellowPagesService(this, "electic-scooter", scooterName);
         yellowPagesService.register();
         // Add behavior
-        addBehaviour(new EScooterBehaviour());
+        addBehaviour(new ElecticScooterREResponder(this, MessageTemplate.MatchPerformative(ACLMessage.REQUEST)));
     }
 
-    class EScooterBehaviour extends Behaviour {
-
-        // Wait for client wanted coordenates
-            // Find closest charging station
-            // Reply with charging station coordenates and pay rate
-            // Move
-            // Compare current coordenates with charging station
-                // IF(station) End.
-                // ELSE Contact CompanyAgent
-
-        /**
-         *
-         */
-        private static final long serialVersionUID = 1L;
-
-        public void action() {
-            ACLMessage msg = receive();
-            if (msg != null) {
-                System.out.println("recebi" + msg);
-                parseClientMsg();
-                ACLMessage reply = msg.createReply();
-                reply.setPerformative(ACLMessage.INFORM);
-                reply.setContent("Got your message!");
-                send(reply);
-            } else {
-                block();    
-            }
-        }
-
-        private void parseClientMsg() {
-            
-        }
-
-		public boolean done() {
-            return false;
-        }
-    }
+    
 
 }

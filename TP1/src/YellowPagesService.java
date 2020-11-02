@@ -9,15 +9,15 @@ public class YellowPagesService {
 
     private final String name;
     private final String type;
-    private  Agent agent;
+    private Agent agent;
 
-    public YellowPagesService(Agent agent, String type, String name){
+    public YellowPagesService(Agent agent, String type, String name) {
         this.agent = (Agent) agent;
         this.type = type;
         this.name = name;
     }
 
-    public void register(){
+    public void register() {
         DFAgentDescription agentDescription = new DFAgentDescription();
         agentDescription.setName(this.agent.getAID());
         ServiceDescription serviceDescription = new ServiceDescription();

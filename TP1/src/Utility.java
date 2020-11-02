@@ -8,22 +8,26 @@ public class Utility {
         return Math.sqrt(Math.pow(p1.getX() - p2.getX(), 2) + Math.pow(p1.getY() - p2.getY(), 2));
     }
 
-    public static void sendRequest(Agent senderAgent, AID receiverAgent, int messageType, String conversationID, String content) {
-        ACLMessage req = new ACLMessage(messageType);
-        req.setConversationId(conversationID);
-        req.addReceiver(receiverAgent);
-        req.setContent(content);
-        senderAgent.send(req);
+    public static void sendMessage(Agent senderAgent, AID receiverAgent, int messageType, String conversationID, String content) {
+        ACLMessage message = new ACLMessage(messageType);
+        message.setConversationId(conversationID);
+        message.addReceiver(receiverAgent);
+        message.setContent(content);
+        senderAgent.send(message);
     }
 
     public static String arrayToString(String[] array) {
         String message = new String();
         for (int i = 0; i < array.length; i++) {
             message += array[i];
-            if (i < array.length-1)
+            if (i < array.length - 1)
                 message += ",";
         }
 
         return message;
+    }
+
+    public static double chanceOfChargingStation(Position nearestChargingStation, Position destination, int weatherQuality, int rushIndex) {
+        return  (1 - (1 / Math.log10(getEuclideanDistance(nearestChargingStation, destination))));
     }
 }
