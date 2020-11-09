@@ -16,6 +16,8 @@ class RequestESBehaviour extends AchieveREInitiator {
         msg.setContent(message);
         AID companyAgent = client.getYellowPagesService().getAgentList("company")[0];
         System.out.println(companyAgent);
+        System.out.println("Client Sent = " + msg.getContent());
+        
         if (companyAgent != null) {
             msg.addReceiver(companyAgent);
         }
@@ -32,6 +34,7 @@ class RequestESBehaviour extends AchieveREInitiator {
 
     protected void handleInform(ACLMessage inform) {
         // ...
+        System.out.println("RECEBI INFORM:" + inform.getContent());
     }
 
     protected void handleFailure(ACLMessage failure) {

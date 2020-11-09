@@ -1,4 +1,4 @@
-import java.lang.Math; 
+import java.lang.Math;
 import jade.core.Agent;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
@@ -8,7 +8,8 @@ public class Utility {
         return Math.sqrt(Math.pow(p1.getX() - p2.getX(), 2) + Math.pow(p1.getY() - p2.getY(), 2));
     }
 
-    public static void sendMessage(Agent senderAgent, AID receiverAgent, int messageType, String conversationID, String content) {
+    public static void sendMessage(Agent senderAgent, AID receiverAgent, int messageType, String conversationID,
+            String content) {
         ACLMessage message = new ACLMessage(messageType);
         message.setConversationId(conversationID);
         message.addReceiver(receiverAgent);
@@ -27,7 +28,18 @@ public class Utility {
         return message;
     }
 
-    public static double chanceOfChargingStation(Position nearestChargingStation, Position destination, int weatherQuality, int rushIndex) {
-        return  (1 - (1 / Math.log10(getEuclideanDistance(nearestChargingStation, destination))));
+    public static double chanceOfChargingStation(Position nearestChargingStation, Position destination,
+            int weatherQuality, int rushIndex) {
+        return (1 - (1 / Math.log10(getEuclideanDistance(nearestChargingStation, destination))));
+    }
+
+    public static Position parsePosition(String message){
+        String[] tokens = message.split(":");
+        String values = tokens[1];
+        String[] coordenates = values.split(",");
+        Integer x = Integer.parseInt(coordenates[0]);
+        Integer y = Integer.parseInt(coordenates[1]);
+        Position position = new Position(x,y);
+        return position;
     }
 }

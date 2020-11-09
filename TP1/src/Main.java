@@ -33,12 +33,15 @@ public class Main {
 
         try {
 
-            AgentController company = mainContainer.acceptNewAgent("company", new CompanyAgent(10,"company_0"));
+            AgentController company = mainContainer.acceptNewAgent("company", new CompanyAgent(10, "company_0"));
             company.start();
 
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 2; i++) {
                 String name = "electricScooter_" + i;
-                AgentController electricScooter = mainContainer.acceptNewAgent(name, new ElectricScooterAgent(name, new Position()));
+                AgentController electricScooter = mainContainer.acceptNewAgent(name,
+                        new ElectricScooterAgent(name, new Position()));
+                        System.out.println("StartingScooter");
+
                 electricScooter.start();
             }
 

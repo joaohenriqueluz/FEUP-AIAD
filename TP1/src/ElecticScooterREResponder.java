@@ -32,7 +32,7 @@ class ElecticScooterREResponder extends AchieveREResponder {
             default:
                 break;
         }
-        System.out.println(reply);
+        System.out.println(reply.getContent());
         return reply;
     }
 
@@ -41,10 +41,10 @@ class ElecticScooterREResponder extends AchieveREResponder {
         Position position = new Position(Integer.parseInt(coordenates[0]), Integer.parseInt(coordenates[1]));
         return Utility.getEuclideanDistance(this.scooter.getPosition(), position);
     }
-    // protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage
-    // response) {
-    // ACLMessage result = request.createReply();
-    // // ...
-    // return result;
-    // }
+
+    protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response) {
+        ACLMessage result = request.createReply();
+        // ...
+        return result;
+    }
 }

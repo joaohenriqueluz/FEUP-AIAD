@@ -32,7 +32,7 @@ public class Position {
 		this.y = rand.nextInt(20);
 	}
 
-	public String toString(){
+	public String toString() {
 		return this.x + "," + this.y;
 	}
 

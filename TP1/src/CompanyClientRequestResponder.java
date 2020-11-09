@@ -4,6 +4,8 @@ import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.proto.AchieveREResponder;
 import jade.lang.acl.MessageTemplate;
+import jade.proto.ContractNetResponder;
+import jade.core.behaviours.DataStore;
 
 class CompanyClientRequestResponder extends AchieveREResponder {
     CompanyAgent company;
@@ -14,44 +16,51 @@ class CompanyClientRequestResponder extends AchieveREResponder {
     }
 
     protected ACLMessage handleRequest(ACLMessage request) {
-        parseRequest(request.getContent());
-        ACLMessage reply = request.createReply();
-        reply.setContent("Recebi, xuxu!");
-        reply.setPerformative(ACLMessage.AGREE);
+        ACLMessage reply = parseRequest(request);
         return reply;
     }
 
-    public void parseRequest(String request){
-        System.out.println(this.company.getLocalName() + ": " + request);
-        String[] tokens = request.split(":");
-        switch(tokens[0]){
+    public ACLMessage parseRequest(ACLMessage request) {
+        System.out.println(this.company.getLocalName() + " Received = " + request.getContent());
+        String[] tokens = request.getContent().split(":");
+        switch (tokens[0]) {
             case "GET-SCOOTER":
-                System.out.println(tokens);
-                parseGetScooter(tokens);
-                break;
+                return parseGetScooter(tokens, request);
             default:
+                System.out.println("DEFAULTTTT");
                 break;
         }
+
+        return request.createReply();
     }
 
-    private void parseGetScooter(String[] tokens){
+    private ACLMessage parseGetScooter(String[] tokens, ACLMessage request) {
         String[] coordenates = tokens[1].split(",");
-        Position position = new Position(Integer.parseInt(coordenates[0]),Integer.parseInt(coordenates[1]));
+        Position position = new Position(Integer.parseInt(coordenates[0]), Integer.parseInt(coordenates[1]));
+        ACLMessage response = request.createReply();
         ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
-        message.setContent("GET-SCOOTER:" + coordenates[0]+ ","+ coordenates[1]);
-        AID[] scooterAgents = company.getYellowPagesService().getAgentList("electic-scooter");
-        System.out.println(scooterAgents);
-        if (scooterAgents != null) {
-            for (AID scooterId : scooterAgents) {
-                message.addReceiver(scooterId);
-           }
+        message.setContent("GET-SCOOTER:" + coordenates[0] + "," + coordenates[1]);
+        try {
+            response.setPerformative(ACLMessage.AGREE);
+            response.setContent("Processing Request");
+            registerPrepareResultNotification(new CompanyScooterContractInitator(this.company, message, request));
+        } catch (Exception e) {
+            response.setPerformative(ACLMessage.NOT_UNDERSTOOD);
+            response.setContent("Corrupted Command");
         }
-        company.send(message);
+
+        return response;
+
+        // AID[] scooterAgents =
+        // company.getYellowPagesService().getAgentList("electic-scooter");
+        // System.out.println(scooterAgents);
+        // if (scooterAgents != null) {
+        // for (AID scooterId : scooterAgents) {
+        // message.addReceiver(scooterId);
+        // }
+        // }
+        // company.send(message);
+
     }
-    // protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage
-    // response) {
-    // ACLMessage result = request.createReply();
-    // // ...
-    // return result;
-    // }
+
 }

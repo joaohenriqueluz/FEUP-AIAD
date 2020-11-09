@@ -1,0 +1,84 @@
+import jade.core.AID;
+import jade.core.Agent;
+import jade.lang.acl.ACLMessage;
+import jade.proto.ContractNetInitiator;
+import java.util.Vector;
+import jade.core.behaviours.DataStore;
+import jade.proto.AchieveREResponder;
+
+
+public class CompanyScooterContractInitator extends ContractNetInitiator {
+
+    private CompanyAgent company;
+    private int bestProposal = -1;
+    private double bestDistance = -1;
+    private ACLMessage request;
+
+    public CompanyScooterContractInitator(CompanyAgent a, ACLMessage msg, ACLMessage request) {
+        super(a, msg);
+        System.out.println("Constructor CompanyScooterContractInitator");
+        this.company = a;
+        this.request =request;
+    }
+
+    protected Vector prepareCfps(ACLMessage cfp) {
+        Vector v = new Vector();
+        cfp.setPerformative(ACLMessage.CFP);
+        AID[] scooterAgents = company.getYellowPagesService().getAgentList("electic-scooter");
+        System.out.println(scooterAgents.length);
+        if (scooterAgents != null) {
+            for (AID scooterId : scooterAgents) {
+                cfp.addReceiver(scooterId);
+            }
+        }
+        System.out.println("After loop " + cfp.getContent());
+
+        v.add(cfp);
+        return v;
+    }
+
+    protected void handleAllResponses(Vector responses, Vector acceptances) {
+
+        System.out.println("got " + responses.size() + " responses!");
+        for (int i = 0; i < responses.size(); i++) {
+            ACLMessage msg = ((ACLMessage) responses.get(i)).createReply();
+            double proposalDistance = Double.parseDouble(((ACLMessage) responses.get(i)).getContent());
+            if(bestProposal == - 1){
+                bestProposal = i;
+                bestDistance = proposalDistance;
+                msg.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+            }
+            else if (bestDistance > proposalDistance) {
+                ((ACLMessage) acceptances.get(bestProposal)).setPerformative(ACLMessage.REJECT_PROPOSAL);
+                bestProposal = i;
+                bestDistance = proposalDistance;
+                msg.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+            }else{
+                msg.setPerformative(ACLMessage.REJECT_PROPOSAL);
+            }
+
+            // msg.setPerformative(ACLMessage.ACCEPT_PROPOSAL); // OR NOT!
+            acceptances.add(msg);
+        }
+    }
+
+    protected void handleAllResultNotifications(Vector resultNotifications) {
+        System.out.println("got " + resultNotifications.size() + " result notifs!");
+        if(resultNotifications.size() == 1){
+            String content = ((ACLMessage) resultNotifications.get(0)).getContent();
+            Position nearestScooterPosition = Utility.parsePosition(content); 
+            ACLMessage response = this.request.createReply();
+        response.setPerformative(ACLMessage.INFORM);
+        response.setContent("SCOOTER-AT:" + nearestScooterPosition.toString());
+        if (this.parent != null) {
+            DataStore ds = getDataStore();
+            ds.put(((AchieveREResponder) parent).RESULT_NOTIFICATION_KEY, response);
+        } else {
+            this.company.send(response);
+        }
+        }
+        
+
+    }
+
+}
