@@ -43,17 +43,17 @@ public class Utility {
     }
 
     public static Position parseMessageWithPosition(String message){
-        String[] tokens = message.split(":");
+        String[] tokens = message.split("=>");
         String values = tokens[1];
         return parsePosition(values);
     }
 
     public static ArrayList<String> parseMessage(String message){
         ArrayList<String> parsed = new ArrayList<String>();
-        String[] tokens = message.split(":");
+        String[] tokens = message.split("=>");
         parsed.add(tokens[0]);
         String values = tokens[1];
-        String[] arguments = values.split("::");
+        String[] arguments = values.split("--");
         for (String argument : arguments) {
             parsed.add(argument);
         }

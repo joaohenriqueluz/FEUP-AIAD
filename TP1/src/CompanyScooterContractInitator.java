@@ -2,6 +2,9 @@ import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.proto.ContractNetInitiator;
+import jdk.jshell.execution.Util;
+
+import java.util.ArrayList;
 import java.util.Vector;
 import jade.core.behaviours.DataStore;
 import jade.proto.AchieveREResponder;
@@ -54,8 +57,6 @@ public class CompanyScooterContractInitator extends ContractNetInitiator {
             } else {
                 msg.setPerformative(ACLMessage.REJECT_PROPOSAL);
             }
-
-            // msg.setPerformative(ACLMessage.ACCEPT_PROPOSAL); // OR NOT!
             acceptances.add(msg);
         }
     }
@@ -65,10 +66,11 @@ public class CompanyScooterContractInitator extends ContractNetInitiator {
             ACLMessage notification = ((ACLMessage) resultNotifications.get(0));
             String content = notification.getContent();
             Utility.log(this.company, notification);
-            Position nearestScooterPosition = Utility.parseMessageWithPosition(content);
+            ArrayList<String> parsed = Utility.parseMessage(content);
+            Position nearestScooterPosition = Utility.parsePosition(parsed.get(1));
             ACLMessage response = this.request.createReply();
             response.setPerformative(ACLMessage.INFORM);
-            response.setContent("SCOOTER-AT:" + nearestScooterPosition.toString());
+            response.setContent("SCOOTER-AT=>" + nearestScooterPosition.toString() +"--" + parsed.get(2));
             if (this.parent != null) {
                 DataStore ds = getDataStore();
                 ds.put(((AchieveREResponder) parent).RESULT_NOTIFICATION_KEY, response);

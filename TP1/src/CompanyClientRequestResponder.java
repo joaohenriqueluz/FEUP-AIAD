@@ -27,6 +27,8 @@ class CompanyClientRequestResponder extends AchieveREResponder {
         switch (message.get(0)) {
             case "GET-SCOOTER":
                 return parseGetScooter(message, request);
+            case "GET-STATION":
+                return parseGetStation(message, request);
             default:
                 break;
         }
@@ -38,7 +40,7 @@ class CompanyClientRequestResponder extends AchieveREResponder {
         Position position = Utility.parsePosition(requestContents.get(1));
         ACLMessage response = request.createReply();
         ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
-        message.setContent("NEAREST-SCOOTER:" + position.getX() + "," + position.getY());
+        message.setContent("NEAREST-SCOOTER=>" + position.getX() + "," + position.getY());
         try {
             response.setPerformative(ACLMessage.AGREE);
             response.setContent("Processing Request");
@@ -49,17 +51,22 @@ class CompanyClientRequestResponder extends AchieveREResponder {
         }
 
         return response;
+    }
 
-        // AID[] scooterAgents =
-        // company.getYellowPagesService().getAgentList("electic-scooter");
-        // System.out.println(scooterAgents);
-        // if (scooterAgents != null) {
-        // for (AID scooterId : scooterAgents) {
-        // message.addReceiver(scooterId);
-        // }
-        // }
-        // company.send(message);
+    private ACLMessage parseGetStation(ArrayList<String> requestContents, ACLMessage request) {
+        Position position = Utility.parsePosition(requestContents.get(1));
 
+        ACLMessage response = request.createReply();
+        try {
+            response.setPerformative(ACLMessage.AGREE);
+            response.setContent("Processing Request");
+            registerPrepareResultNotification(new CalculateNearestStation(this.company, request, position));
+        } catch (Exception e) {
+            response.setPerformative(ACLMessage.NOT_UNDERSTOOD);
+            response.setContent("Corrupted Command");
+        }
+
+        return response;
     }
 
 }

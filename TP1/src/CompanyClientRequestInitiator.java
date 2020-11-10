@@ -1,4 +1,7 @@
 import jade.core.Agent;
+
+import java.util.ArrayList;
+
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
@@ -12,12 +15,12 @@ class CompanyClientRequestInitiator extends AchieveREInitiator {
         super(client, msg);
         this.client = client;
         // Request: GET-SCOOTER [Position]
-        String message = "GET-SCOOTER:" + this.client.getPosition().toString();
+        String message = "GET-SCOOTER=>" + this.client.getPosition().toString();
         msg.setContent(message);
         AID companyAgent = client.getYellowPagesService().getAgentList("company")[0];
         System.out.println(companyAgent);
         System.out.println("Client Sent = " + msg.getContent());
-        
+
         if (companyAgent != null) {
             msg.addReceiver(companyAgent);
         }
@@ -33,12 +36,16 @@ class CompanyClientRequestInitiator extends AchieveREInitiator {
     }
 
     protected void handleInform(ACLMessage inform) {
-        // ...
         Utility.log(this.client,inform);
-        Position newClientPosition = Utility.parseMessageWithPosition(inform.getContent());
-        this.client.setPosition(newClientPosition);
-        // this.client.addBehaviour(new CompanyClientRequestInitiator(this.client, new ACLMessage(ACLMessage.REQUEST)));
         this.client.setDestination(Utility.getDestination());
+        ArrayList<String> parsed = Utility.parseMessage(inform.getContent());
+        Position newClientPosition = Utility.parsePosition(parsed.get(1));
+        AID scooterAID = new AID(parsed.get(2));
+        ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+        message.addReceiver(scooterAID);
+        message.setContent("DESTINATION=>" + this.client.getDestination().toString());
+        this.client.setPosition(newClientPosition);
+        this.client.addBehaviour(new ClientScooterRequestInitiator(this.client, message));
     }
 
     protected void handleFailure(ACLMessage failure) {

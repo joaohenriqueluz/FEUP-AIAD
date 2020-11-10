@@ -1,9 +1,9 @@
+import jade.proto.ContractNetResponder;
 import java.util.ArrayList;
-
 import jade.core.Agent;
+import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.proto.ContractNetResponder;
 
 public class CompanyScooterContractResponder extends ContractNetResponder {
 
@@ -39,14 +39,15 @@ public class CompanyScooterContractResponder extends ContractNetResponder {
 
 
     protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage reject) {
-        System.out.println(myAgent.getLocalName() + " got a reject...");
+        System.out.println(this.scooter.getLocalName() + " got a reject...");
     }
 
     protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
-        System.out.println(myAgent.getLocalName() + " got an accept!");
+        System.out.println(this.scooter.getLocalName() + " got an accept!");
         ACLMessage result = accept.createReply();
         result.setPerformative(ACLMessage.INFORM);
-        result.setContent("POSITION:"+ this.scooter.getPosition().toString());
+        result.setContent("IM-AT=>"+ this.scooter.getPosition().toString()+ "--" + this.scooter.getAID().getName());
+        this.scooter.addBehaviour(new ClientScooterRequestResponder(this.scooter, MessageTemplate.MatchPerformative(ACLMessage.REQUEST)));
         return result;
     }
 

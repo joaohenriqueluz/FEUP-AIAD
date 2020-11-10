@@ -38,6 +38,19 @@ public class CompanyAgent extends Agent {
         System.out.println(getLocalName() + ": starting to work!");
     }
 
+    public Position getNearestStation(Position destination) {
+        Position nearest = null;
+        for (Position position : chargingStationPositions) {
+            if (nearest == null) {
+                nearest = position;
+            } else if (Utility.getEuclideanDistance(nearest, destination) > Utility.getEuclideanDistance(position,
+                    destination)) {
+                nearest = position;
+            }
+        }
+        return nearest;
+    }
+
     public void takeDown() {
         System.out.println(getLocalName() + ": done working.");
     }

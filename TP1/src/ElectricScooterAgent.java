@@ -39,6 +39,14 @@ public class ElectricScooterAgent extends Agent {
 		this.position = position;
 	}
 
+	public YellowPagesService getYellowPagesService() {
+		return this.yellowPagesService;
+	}
+
+	public void setYellowPagesService(YellowPagesService yellowPagesService) {
+		this.yellowPagesService = yellowPagesService;
+	}
+
 	public void setup() {
 		// Register in Yellow Page service
 		yellowPagesService = new YellowPagesService(this, "electic-scooter", scooterName);
