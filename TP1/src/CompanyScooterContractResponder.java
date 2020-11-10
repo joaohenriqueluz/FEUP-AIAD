@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -14,26 +16,24 @@ public class CompanyScooterContractResponder extends ContractNetResponder {
     }
 
     protected ACLMessage handleCfp(ACLMessage cfp) {
-        System.out.println(this.scooter.getLocalName() + " Received: " + cfp);
+        Utility.log(this.scooter, cfp);
         ACLMessage reply = cfp.createReply();
-        String[] tokens = cfp.getContent().split(":");
+        ArrayList<String> tokens = Utility.parseMessage(cfp.getContent());
         double distance;
-        switch (tokens[0]) {
-            case "GET-SCOOTER":
-                distance = parseGetScooter(tokens);
+        switch (tokens.get(0)) {
+            case "NEAREST-SCOOTER":
+                distance = calculateDistance(tokens);
                 reply.setContent("" + distance);
                 reply.setPerformative(ACLMessage.PROPOSE);
                 break;
             default:
                 break;
         }
-        System.out.println(this.scooter.getLocalName() + "answered: " + reply.getContent());
         return reply;
     }
 
-    private double parseGetScooter(String[] tokens) {
-        String[] coordenates = tokens[1].split(",");
-        Position position = new Position(Integer.parseInt(coordenates[0]), Integer.parseInt(coordenates[1]));
+    private double calculateDistance(ArrayList<String> tokens) {
+        Position position = Utility.parsePosition(tokens.get(1));
         return Utility.getEuclideanDistance(this.scooter.getPosition(), position);
     }
 

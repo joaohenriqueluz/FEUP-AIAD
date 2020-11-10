@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import jade.core.Agent;
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
@@ -21,25 +22,23 @@ class CompanyClientRequestResponder extends AchieveREResponder {
     }
 
     public ACLMessage parseRequest(ACLMessage request) {
-        System.out.println(this.company.getLocalName() + " Received = " + request.getContent());
-        String[] tokens = request.getContent().split(":");
-        switch (tokens[0]) {
+        Utility.log(this.company, request);
+        ArrayList<String> message = Utility.parseMessage(request.getContent());
+        switch (message.get(0)) {
             case "GET-SCOOTER":
-                return parseGetScooter(tokens, request);
+                return parseGetScooter(message, request);
             default:
-                System.out.println("DEFAULTTTT");
                 break;
         }
 
         return request.createReply();
     }
 
-    private ACLMessage parseGetScooter(String[] tokens, ACLMessage request) {
-        String[] coordenates = tokens[1].split(",");
-        Position position = new Position(Integer.parseInt(coordenates[0]), Integer.parseInt(coordenates[1]));
+    private ACLMessage parseGetScooter(ArrayList<String> requestContents, ACLMessage request) {
+        Position position = Utility.parsePosition(requestContents.get(1));
         ACLMessage response = request.createReply();
         ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
-        message.setContent("GET-SCOOTER:" + coordenates[0] + "," + coordenates[1]);
+        message.setContent("NEAREST-SCOOTER:" + position.getX() + "," + position.getY());
         try {
             response.setPerformative(ACLMessage.AGREE);
             response.setContent("Processing Request");

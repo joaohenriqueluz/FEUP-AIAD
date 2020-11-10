@@ -1,4 +1,6 @@
 import java.lang.Math;
+import java.util.ArrayList;
+
 import jade.core.Agent;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
@@ -34,12 +36,35 @@ public class Utility {
     }
 
     public static Position parsePosition(String message){
-        String[] tokens = message.split(":");
-        String values = tokens[1];
-        String[] coordenates = values.split(",");
+        String[] coordenates = message.split(",");
         Integer x = Integer.parseInt(coordenates[0]);
         Integer y = Integer.parseInt(coordenates[1]);
-        Position position = new Position(x,y);
-        return position;
+        return (new Position(x,y));
+    }
+
+    public static Position parseMessageWithPosition(String message){
+        String[] tokens = message.split(":");
+        String values = tokens[1];
+        return parsePosition(values);
+    }
+
+    public static ArrayList<String> parseMessage(String message){
+        ArrayList<String> parsed = new ArrayList<String>();
+        String[] tokens = message.split(":");
+        parsed.add(tokens[0]);
+        String values = tokens[1];
+        String[] arguments = values.split("::");
+        for (String argument : arguments) {
+            parsed.add(argument);
+        }
+        return parsed;
+    }
+
+    public static Position getDestination(){
+        return new Position();
+    }
+
+    public static void log(Agent a, ACLMessage message){
+        System.out.println(a.getLocalName() + " received: [" + message.getPerformative() +  "] \"" + message.getContent() + "\"");
     }
 }

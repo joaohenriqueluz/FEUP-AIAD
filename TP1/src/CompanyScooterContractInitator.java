@@ -6,7 +6,6 @@ import java.util.Vector;
 import jade.core.behaviours.DataStore;
 import jade.proto.AchieveREResponder;
 
-
 public class CompanyScooterContractInitator extends ContractNetInitiator {
 
     private CompanyAgent company;
@@ -18,7 +17,7 @@ public class CompanyScooterContractInitator extends ContractNetInitiator {
         super(a, msg);
         System.out.println("Constructor CompanyScooterContractInitator");
         this.company = a;
-        this.request =request;
+        this.request = request;
     }
 
     protected Vector prepareCfps(ACLMessage cfp) {
@@ -43,17 +42,16 @@ public class CompanyScooterContractInitator extends ContractNetInitiator {
         for (int i = 0; i < responses.size(); i++) {
             ACLMessage msg = ((ACLMessage) responses.get(i)).createReply();
             double proposalDistance = Double.parseDouble(((ACLMessage) responses.get(i)).getContent());
-            if(bestProposal == - 1){
+            if (bestProposal == -1) {
                 bestProposal = i;
                 bestDistance = proposalDistance;
                 msg.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
-            }
-            else if (bestDistance > proposalDistance) {
+            } else if (bestDistance > proposalDistance) {
                 ((ACLMessage) acceptances.get(bestProposal)).setPerformative(ACLMessage.REJECT_PROPOSAL);
                 bestProposal = i;
                 bestDistance = proposalDistance;
                 msg.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
-            }else{
+            } else {
                 msg.setPerformative(ACLMessage.REJECT_PROPOSAL);
             }
 
@@ -63,21 +61,21 @@ public class CompanyScooterContractInitator extends ContractNetInitiator {
     }
 
     protected void handleAllResultNotifications(Vector resultNotifications) {
-        System.out.println("got " + resultNotifications.size() + " result notifs!");
-        if(resultNotifications.size() == 1){
-            String content = ((ACLMessage) resultNotifications.get(0)).getContent();
-            Position nearestScooterPosition = Utility.parsePosition(content); 
+        if (resultNotifications.size() == 1) {
+            ACLMessage notification = ((ACLMessage) resultNotifications.get(0));
+            String content = notification.getContent();
+            Utility.log(this.company, notification);
+            Position nearestScooterPosition = Utility.parseMessageWithPosition(content);
             ACLMessage response = this.request.createReply();
-        response.setPerformative(ACLMessage.INFORM);
-        response.setContent("SCOOTER-AT:" + nearestScooterPosition.toString());
-        if (this.parent != null) {
-            DataStore ds = getDataStore();
-            ds.put(((AchieveREResponder) parent).RESULT_NOTIFICATION_KEY, response);
-        } else {
-            this.company.send(response);
+            response.setPerformative(ACLMessage.INFORM);
+            response.setContent("SCOOTER-AT:" + nearestScooterPosition.toString());
+            if (this.parent != null) {
+                DataStore ds = getDataStore();
+                ds.put(((AchieveREResponder) parent).RESULT_NOTIFICATION_KEY, response);
+            } else {
+                this.company.send(response);
+            }
         }
-        }
-        
 
     }
 

@@ -4,11 +4,11 @@ import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.proto.AchieveREInitiator;
 
-class RequestESBehaviour extends AchieveREInitiator {
+class CompanyClientRequestInitiator extends AchieveREInitiator {
     private int n = 0;
     ClientAgent client;
 
-    public RequestESBehaviour(ClientAgent client, ACLMessage msg) {
+    public CompanyClientRequestInitiator(ClientAgent client, ACLMessage msg) {
         super(client, msg);
         this.client = client;
         // Request: GET-SCOOTER [Position]
@@ -34,7 +34,11 @@ class RequestESBehaviour extends AchieveREInitiator {
 
     protected void handleInform(ACLMessage inform) {
         // ...
-        System.out.println("RECEBI INFORM:" + inform.getContent());
+        Utility.log(this.client,inform);
+        Position newClientPosition = Utility.parseMessageWithPosition(inform.getContent());
+        this.client.setPosition(newClientPosition);
+        // this.client.addBehaviour(new CompanyClientRequestInitiator(this.client, new ACLMessage(ACLMessage.REQUEST)));
+        this.client.setDestination(Utility.getDestination());
     }
 
     protected void handleFailure(ACLMessage failure) {
