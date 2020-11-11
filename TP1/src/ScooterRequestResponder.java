@@ -9,9 +9,9 @@ import jade.proto.ContractNetResponder;
 import jade.core.behaviours.DataStore;
 
 class ScooterRequestResponder extends AchieveREResponder {
-    
+
     ElectricScooterAgent scooter;
-    
+
     public ScooterRequestResponder(ElectricScooterAgent scooter, MessageTemplate mt) {
         super(scooter, mt);
         this.scooter = scooter;
@@ -27,6 +27,7 @@ class ScooterRequestResponder extends AchieveREResponder {
         ArrayList<String> message = Utility.parseMessage(request.getContent());
         switch (message.get(0)) {
             case "DESTINATION":
+                this.scooter.setBusy(true);
                 return getDestinationInfo(message, request);
             case "GO-TO":
                 return parseGoTo(message, request);
@@ -55,7 +56,7 @@ class ScooterRequestResponder extends AchieveREResponder {
         return response;
     }
 
-    private ACLMessage parseGoTo(ArrayList<String> requestContents, ACLMessage request){
+    private ACLMessage parseGoTo(ArrayList<String> requestContents, ACLMessage request) {
         Position newScooterPosition = Utility.parseMessageWithPosition(request.getContent());
         ACLMessage response = request.createReply();
         this.scooter.setPosition(newScooterPosition);

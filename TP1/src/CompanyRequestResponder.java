@@ -42,10 +42,10 @@ class CompanyRequestResponder extends AchieveREResponder {
         Position position = Utility.parsePosition(requestContents.get(1));
         ACLMessage response = request.createReply();
         ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
-        message.setContent("NEAREST-SCOOTER=>" + position.getX() + "," + position.getY());
+        message.setContent("NEAREST-SCOOTER=>" + position.toString());
         try {
             response.setPerformative(ACLMessage.AGREE);
-            response.setContent("Processing Request");
+            response.setContent("Finding nearest available scooter for position " + position.toString());
             registerPrepareResultNotification(new CompanyScooterContractInitator(this.company, message, request));
         } catch (Exception e) {
             response.setPerformative(ACLMessage.NOT_UNDERSTOOD);
@@ -61,7 +61,7 @@ class CompanyRequestResponder extends AchieveREResponder {
         ACLMessage response = request.createReply();
         try {
             response.setPerformative(ACLMessage.AGREE);
-            response.setContent("Processing Request");
+            response.setContent("Finding nearest station for position " + position.toString());
             registerPrepareResultNotification(new CalculateNearestStation(this.company, request, position));
         } catch (Exception e) {
             response.setPerformative(ACLMessage.NOT_UNDERSTOOD);
@@ -73,17 +73,16 @@ class CompanyRequestResponder extends AchieveREResponder {
     private ACLMessage parsePickUp(ArrayList<String> requestContents, ACLMessage request) {
         Position position = Utility.parsePosition(requestContents.get(1));
         ACLMessage message = new ACLMessage(ACLMessage.CFP);
-        message.setContent("GET-WORKER=>"+ position.toString());
+        message.setContent("GET-WORKER=>" + position.toString());
         ACLMessage response = request.createReply();
         try {
-            if(!this.company.getNearestStation(position).equals(position)){
+            if (!this.company.getNearestStation(position).equals(position)) {
                 response.setPerformative(ACLMessage.AGREE);
-                response.setContent("Processing Request");
-                registerPrepareResultNotification(new CompanyWorkerContractInitiator(this.company,message, request));
-            }
-            else{
+                response.setContent("Finding available workers");
+                registerPrepareResultNotification(new CompanyWorkerContractInitiator(this.company, message, request));
+            } else {
                 response.setPerformative(ACLMessage.REFUSE);
-                response.setContent("Request Denied");
+                response.setContent("Already in station, no need");
             }
         } catch (Exception e) {
             response.setPerformative(ACLMessage.NOT_UNDERSTOOD);

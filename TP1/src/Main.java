@@ -36,22 +36,22 @@ public class Main {
             AgentController company = mainContainer.acceptNewAgent("company", new CompanyAgent(10, "company_0"));
             company.start();
 
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < 1; i++) {
                 String name = "electricScooter_" + i;
                 AgentController electricScooter = mainContainer.acceptNewAgent(name,
                         new ElectricScooterAgent(name, new Position()));
-                        System.out.println("StartingScooter");
+                System.out.println("StartingScooter");
 
                 electricScooter.start();
             }
 
-            for (int i = 0; i < 1; i++) {
+            for (int i = 0; i < 2; i++) {
                 String name = "client_" + i;
                 AgentController client = mainContainer.acceptNewAgent(name, new ClientAgent(name));
                 client.start();
             }
 
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 1; i++) {
                 String name = "worker_" + i;
                 AgentController worker = mainContainer.acceptNewAgent(name, new WorkerAgent(name));
                 worker.start();

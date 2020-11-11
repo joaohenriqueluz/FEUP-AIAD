@@ -5,58 +5,70 @@ import jade.lang.acl.MessageTemplate;
 
 public class ElectricScooterAgent extends Agent {
 
-	private String scooterName;
-	private Integer range;
-	private Position position;
-	private YellowPagesService yellowPagesService;
+    private String scooterName;
+    private Integer range;
+    private Position position;
+    private YellowPagesService yellowPagesService;
+    private Boolean busy;
 
-	public ElectricScooterAgent(String name, Position position) {
-		scooterName = name;
-		this.position = position;
-	}
+    public ElectricScooterAgent(String name, Position position) {
+        scooterName = name;
+        this.position = position;
+        busy = false;
+    }
 
-	public String getScooterName() {
-		return this.scooterName;
-	}
+    public String getScooterName() {
+        return this.scooterName;
+    }
 
-	public void setScooterName(String scooterName) {
-		this.scooterName = scooterName;
-	}
+    public void setScooterName(String scooterName) {
+        this.scooterName = scooterName;
+    }
 
-	public Integer getRange() {
-		return this.range;
-	}
+    public Integer getRange() {
+        return this.range;
+    }
 
-	public void setRange(Integer range) {
-		this.range = range;
-	}
+    public void setRange(Integer range) {
+        this.range = range;
+    }
 
-	public Position getPosition() {
-		return this.position;
-	}
+    public Boolean isBusy() {
+		System.out.println(this.getLocalName() + " busy = " + this.busy);
+        return this.busy;
+    }
 
-	public void setPosition(Position position) {
-		this.position = position;
-	}
+    public void setBusy(Boolean busy) {
+		System.out.println(this.getLocalName() + " busy = " + this.busy);
+        this.busy = busy;
+    }
 
-	public YellowPagesService getYellowPagesService() {
-		return this.yellowPagesService;
-	}
+    public Position getPosition() {
+        return this.position;
+    }
 
-	public void setYellowPagesService(YellowPagesService yellowPagesService) {
-		this.yellowPagesService = yellowPagesService;
-	}
+    public void setPosition(Position position) {
+        this.position = position;
+    }
 
-	public void setup() {
-		// Register in Yellow Page service
-		yellowPagesService = new YellowPagesService(this, "electic-scooter", scooterName);
-		yellowPagesService.register();
-		// Add behavior
-		// addBehaviour(new ElecticScooterREResponder(this,
-		// MessageTemplate.MatchPerformative(ACLMessage.REQUEST)));
-		System.out.println("E-Scooter setup");
+    public YellowPagesService getYellowPagesService() {
+        return this.yellowPagesService;
+    }
 
-		addBehaviour(new CompanyScooterContractResponder(this, MessageTemplate.MatchPerformative(ACLMessage.CFP)));
-	}
+    public void setYellowPagesService(YellowPagesService yellowPagesService) {
+        this.yellowPagesService = yellowPagesService;
+    }
+
+    public void setup() {
+        // Register in Yellow Page service
+        yellowPagesService = new YellowPagesService(this, "electic-scooter", scooterName);
+        yellowPagesService.register();
+        // Add behavior
+        // addBehaviour(new ElecticScooterREResponder(this,
+        // MessageTemplate.MatchPerformative(ACLMessage.REQUEST)));
+        System.out.println("E-Scooter setup");
+
+        addBehaviour(new CompanyScooterContractResponder(this, MessageTemplate.MatchPerformative(ACLMessage.CFP)));
+    }
 
 }

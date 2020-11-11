@@ -7,7 +7,6 @@ import jade.proto.AchieveREInitiator;
 import jade.proto.AchieveREResponder;
 import jade.core.behaviours.DataStore;
 
-
 class RequestStationInitiator extends AchieveREInitiator {
     private int n = 0;
     ElectricScooterAgent scooter;
@@ -32,7 +31,7 @@ class RequestStationInitiator extends AchieveREInitiator {
     }
 
     protected void handleInform(ACLMessage inform) {
-        Utility.log(this.scooter,inform);
+        Utility.log(this.scooter, inform);
 
         ArrayList<String> parsed = Utility.parseMessage(inform.getContent());
         Position nearestStationPosition = Utility.parsePosition(parsed.get(1));

@@ -35,7 +35,7 @@ class RequestScooterInitiator extends AchieveREInitiator {
     }
 
     protected void handleInform(ACLMessage inform) {
-        Utility.log(this.client,inform);
+        Utility.log(this.client, inform);
         this.client.setDestination(Utility.getDestination());
         ArrayList<String> parsed = Utility.parseMessage(inform.getContent());
         Position newClientPosition = Utility.parsePosition(parsed.get(1));
@@ -48,6 +48,8 @@ class RequestScooterInitiator extends AchieveREInitiator {
     }
 
     protected void handleFailure(ACLMessage failure) {
+        System.out.println("-----------------RECEIVED FAILURE ");
         Utility.log(this.client, failure);
+        System.out.println("VOU a pé");
     }
 }

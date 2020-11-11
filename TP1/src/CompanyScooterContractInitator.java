@@ -2,7 +2,6 @@ import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.proto.ContractNetInitiator;
-import jdk.jshell.execution.Util;
 
 import java.util.ArrayList;
 import java.util.Vector;
@@ -18,7 +17,6 @@ public class CompanyScooterContractInitator extends ContractNetInitiator {
 
     public CompanyScooterContractInitator(CompanyAgent a, ACLMessage msg, ACLMessage request) {
         super(a, msg);
-        System.out.println("Constructor CompanyScooterContractInitator");
         this.company = a;
         this.request = request;
     }
@@ -43,21 +41,36 @@ public class CompanyScooterContractInitator extends ContractNetInitiator {
 
         System.out.println("got " + responses.size() + " responses!");
         for (int i = 0; i < responses.size(); i++) {
-            ACLMessage msg = ((ACLMessage) responses.get(i)).createReply();
-            double proposalDistance = Double.parseDouble(((ACLMessage) responses.get(i)).getContent());
-            if (bestProposal == -1) {
-                bestProposal = i;
-                bestDistance = proposalDistance;
-                msg.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
-            } else if (bestDistance > proposalDistance) {
-                ((ACLMessage) acceptances.get(bestProposal)).setPerformative(ACLMessage.REJECT_PROPOSAL);
-                bestProposal = i;
-                bestDistance = proposalDistance;
-                msg.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
-            } else {
-                msg.setPerformative(ACLMessage.REJECT_PROPOSAL);
+            if (((ACLMessage) responses.get(i)).getPerformative() == ACLMessage.PROPOSE) {
+                ACLMessage msg = ((ACLMessage) responses.get(i)).createReply();
+                double proposalDistance = Double.parseDouble(((ACLMessage) responses.get(i)).getContent());
+                if (bestProposal == -1) {
+                    bestProposal = i;
+                    bestDistance = proposalDistance;
+                    msg.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+                } else if (bestDistance > proposalDistance) {
+                    ((ACLMessage) acceptances.get(bestProposal)).setPerformative(ACLMessage.REJECT_PROPOSAL);
+                    bestProposal = i;
+                    bestDistance = proposalDistance;
+                    msg.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+                } else {
+                    msg.setPerformative(ACLMessage.REJECT_PROPOSAL);
+                }
+                acceptances.add(msg);
             }
-            acceptances.add(msg);
+        }
+        if (acceptances.size() == 0) {
+            ACLMessage response = this.request.createReply();
+            response.setPerformative(ACLMessage.FAILURE);
+            response.setContent("Could not find available scooters");
+            if (this.parent != null) {
+                System.out.println("PARENT NOT NULL");
+                DataStore ds = getDataStore();
+                ds.put(((AchieveREResponder) parent).RESULT_NOTIFICATION_KEY, response);
+            } else {
+                System.out.println("PARENT IS NULL");
+                this.company.send(response);
+            }
         }
     }
 
@@ -70,7 +83,7 @@ public class CompanyScooterContractInitator extends ContractNetInitiator {
             Position nearestScooterPosition = Utility.parsePosition(parsed.get(1));
             ACLMessage response = this.request.createReply();
             response.setPerformative(ACLMessage.INFORM);
-            response.setContent("SCOOTER-AT=>" + nearestScooterPosition.toString() +"--" + parsed.get(2));
+            response.setContent("SCOOTER-AT=>" + nearestScooterPosition.toString() + "--" + parsed.get(2));
             if (this.parent != null) {
                 DataStore ds = getDataStore();
                 ds.put(((AchieveREResponder) parent).RESULT_NOTIFICATION_KEY, response);
@@ -80,5 +93,4 @@ public class CompanyScooterContractInitator extends ContractNetInitiator {
         }
 
     }
-
 }

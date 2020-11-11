@@ -3,7 +3,6 @@ import jade.core.AID;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.proto.AchieveREInitiator;
-import jdk.jshell.execution.Util;
 
 class RequestPickUpResponder extends AchieveREInitiator {
     ElectricScooterAgent scooter;
@@ -21,10 +20,12 @@ class RequestPickUpResponder extends AchieveREInitiator {
 
     protected void handleAgree(ACLMessage agree) {
         Utility.log(this.scooter, agree);
+        this.scooter.setBusy(false);
     }
 
     protected void handleRefuse(ACLMessage refuse) {
         Utility.log(this.scooter, refuse);
+        this.scooter.setBusy(false);
     }
 
     protected void handleInform(ACLMessage inform) {

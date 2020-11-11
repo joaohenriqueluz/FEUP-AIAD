@@ -8,6 +8,7 @@ import jade.lang.acl.MessageTemplate;
 public class WorkerContractResponder extends ContractNetResponder {
 
     private WorkerAgent worker;
+    private Position positionOfScooter;
 
     public WorkerContractResponder(WorkerAgent a, MessageTemplate mt) {
         super(a, mt);
@@ -22,7 +23,8 @@ public class WorkerContractResponder extends ContractNetResponder {
         double distance;
         switch (tokens.get(0)) {
             case "GET-WORKER":
-                distance = calculateDistance(tokens);
+                positionOfScooter = Utility.parsePosition(tokens.get(1));
+                distance = Utility.getEuclideanDistance(this.worker.getPosition(),positionOfScooter);
                 reply.setContent("" + distance);
                 reply.setPerformative(ACLMessage.PROPOSE);
                 break;
@@ -32,22 +34,18 @@ public class WorkerContractResponder extends ContractNetResponder {
         return reply;
     }
 
-    private double calculateDistance(ArrayList<String> tokens) {
-        Position position = Utility.parsePosition(tokens.get(1));
-        return Utility.getEuclideanDistance(this.worker.getPosition(), position);
-    }
-
-
     protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage reject) {
         System.out.println(this.worker.getLocalName() + " got a reject...");
     }
 
     protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
         System.out.println(this.worker.getLocalName() + " got an accept!");
+        this.worker.setPosition(positionOfScooter);
         ACLMessage result = accept.createReply();
         result.setPerformative(ACLMessage.INFORM);
-        result.setContent("IM-AT=>"+ this.worker.getPosition().toString()+ "--" + this.worker.getAID().getName());
-        // this.worker.addBehaviour(new ScooterRequestResponder(this.worker, MessageTemplate.MatchPerformative(ACLMessage.REQUEST)));
+        result.setContent("IM-AT=>" + this.worker.getPosition().toString() + "--" + this.worker.getAID().getName());
+        // this.worker.addBehaviour(new ScooterRequestResponder(this.worker,
+        // MessageTemplate.MatchPerformative(ACLMessage.REQUEST)));
         return result;
     }
 

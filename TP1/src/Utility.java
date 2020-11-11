@@ -35,20 +35,20 @@ public class Utility {
         return (1 - (1 / Math.log10(getEuclideanDistance(nearestChargingStation, destination))));
     }
 
-    public static Position parsePosition(String message){
+    public static Position parsePosition(String message) {
         String[] coordenates = message.split(",");
         Integer x = Integer.parseInt(coordenates[0]);
         Integer y = Integer.parseInt(coordenates[1]);
-        return (new Position(x,y));
+        return (new Position(x, y));
     }
 
-    public static Position parseMessageWithPosition(String message){
+    public static Position parseMessageWithPosition(String message) {
         String[] tokens = message.split("=>");
         String values = tokens[1];
         return parsePosition(values);
     }
 
-    public static ArrayList<String> parseMessage(String message){
+    public static ArrayList<String> parseMessage(String message) {
         ArrayList<String> parsed = new ArrayList<String>();
         String[] tokens = message.split("=>");
         parsed.add(tokens[0]);
@@ -60,11 +60,12 @@ public class Utility {
         return parsed;
     }
 
-    public static Position getDestination(){
+    public static Position getDestination() {
         return new Position();
     }
 
-    public static void log(Agent a, ACLMessage message){
-        System.out.println(a.getLocalName() + " received: [" + message.getPerformative() +  "] \"" + message.getContent() + "\"");
+    public static void log(Agent a, ACLMessage message) {
+        System.out.println(
+                a.getLocalName() + " received: [" + message.getPerformative() + "] \"" + message.getContent() + "\"");
     }
 }
