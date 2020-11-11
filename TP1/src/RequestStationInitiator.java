@@ -24,12 +24,11 @@ class RequestStationInitiator extends AchieveREInitiator {
     }
 
     protected void handleAgree(ACLMessage agree) {
-        // ...
-        System.out.println(agree.getContent());
+        Utility.log(this.scooter, agree);
     }
 
     protected void handleRefuse(ACLMessage refuse) {
-        // ...
+        Utility.log(this.scooter, refuse);
     }
 
     protected void handleInform(ACLMessage inform) {
@@ -51,6 +50,6 @@ class RequestStationInitiator extends AchieveREInitiator {
     }
 
     protected void handleFailure(ACLMessage failure) {
-        // ...
+        Utility.log(this.scooter, failure);
     }
 }

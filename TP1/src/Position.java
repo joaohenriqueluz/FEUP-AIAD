@@ -36,4 +36,24 @@ public class Position {
 		return this.x + "," + this.y;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+
+		if (obj == null) {
+			return false;
+		}
+
+		if (obj == this) {
+			return true;
+		}
+
+		if (!(obj instanceof Position)) {
+			return false;
+		}
+
+		Position c = (Position) obj;
+
+		return c.getY() == this.x && c.getY() == this.y;
+	}
+	
 }

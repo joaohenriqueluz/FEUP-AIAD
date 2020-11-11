@@ -14,22 +14,27 @@ class ClientScooterRequestInitiator extends AchieveREInitiator {
     }
 
     protected void handleAgree(ACLMessage agree) {
+        Utility.log(this.client, agree);
+
         System.out.println(agree.getContent());
     }
 
     protected void handleRefuse(ACLMessage refuse) {
-        // ...
+        Utility.log(this.client, refuse);
     }
 
     protected void handleInform(ACLMessage inform) {
         // ...
-        Utility.log(this.client,inform);
-        // Position newClientPosition = Utility.parseMessageWithPosition(inform.getContent());
-        // this.client.setPosition(newClientPosition);
-		// this.client.addBehaviour(new ClientScooterRequestInitiator(this, new ACLMessage(ACLMessage.REQUEST)));
+        Utility.log(this.client, inform);
+        Position stationPosition = Utility.parseMessageWithPosition(inform.getContent());
+        Position decision = this.client.makeDecision(stationPosition);
+        ACLMessage reply = inform.createReply();
+        reply.setPerformative(ACLMessage.REQUEST);
+        reply.setContent("GO-TO=>" + decision.toString());
+        this.client.send(reply);
     }
 
     protected void handleFailure(ACLMessage failure) {
-        // ...
+        Utility.log(this.client, failure);
     }
 }

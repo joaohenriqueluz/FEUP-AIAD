@@ -5,23 +5,23 @@ import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
-public class CompanyScooterContractResponder extends ContractNetResponder {
+public class WorkerContractResponder extends ContractNetResponder {
 
-    private ElectricScooterAgent scooter;
+    private WorkerAgent worker;
 
-    public CompanyScooterContractResponder(ElectricScooterAgent a, MessageTemplate mt) {
+    public WorkerContractResponder(WorkerAgent a, MessageTemplate mt) {
         super(a, mt);
-        System.out.println("Constructor CompanyScooterContractResponder");
-        this.scooter = a;
+        System.out.println("Constructor WorkerContractResponder");
+        this.worker = a;
     }
 
     protected ACLMessage handleCfp(ACLMessage cfp) {
-        Utility.log(this.scooter, cfp);
+        Utility.log(this.worker, cfp);
         ACLMessage reply = cfp.createReply();
         ArrayList<String> tokens = Utility.parseMessage(cfp.getContent());
         double distance;
         switch (tokens.get(0)) {
-            case "NEAREST-SCOOTER":
+            case "GET-WORKER":
                 distance = calculateDistance(tokens);
                 reply.setContent("" + distance);
                 reply.setPerformative(ACLMessage.PROPOSE);
@@ -34,20 +34,20 @@ public class CompanyScooterContractResponder extends ContractNetResponder {
 
     private double calculateDistance(ArrayList<String> tokens) {
         Position position = Utility.parsePosition(tokens.get(1));
-        return Utility.getEuclideanDistance(this.scooter.getPosition(), position);
+        return Utility.getEuclideanDistance(this.worker.getPosition(), position);
     }
 
 
     protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage reject) {
-        System.out.println(this.scooter.getLocalName() + " got a reject...");
+        System.out.println(this.worker.getLocalName() + " got a reject...");
     }
 
     protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
-        System.out.println(this.scooter.getLocalName() + " got an accept!");
+        System.out.println(this.worker.getLocalName() + " got an accept!");
         ACLMessage result = accept.createReply();
         result.setPerformative(ACLMessage.INFORM);
-        result.setContent("IM-AT=>"+ this.scooter.getPosition().toString()+ "--" + this.scooter.getAID().getName());
-        this.scooter.addBehaviour(new ScooterRequestResponder(this.scooter, MessageTemplate.MatchPerformative(ACLMessage.REQUEST)));
+        result.setContent("IM-AT=>"+ this.worker.getPosition().toString()+ "--" + this.worker.getAID().getName());
+        // this.worker.addBehaviour(new ScooterRequestResponder(this.worker, MessageTemplate.MatchPerformative(ACLMessage.REQUEST)));
         return result;
     }
 

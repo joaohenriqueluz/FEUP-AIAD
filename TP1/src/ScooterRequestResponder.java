@@ -8,12 +8,13 @@ import jade.lang.acl.MessageTemplate;
 import jade.proto.ContractNetResponder;
 import jade.core.behaviours.DataStore;
 
-class CompanyClientRequestResponder extends AchieveREResponder {
-    CompanyAgent company;
-
-    public CompanyClientRequestResponder(CompanyAgent company, MessageTemplate mt) {
-        super(company, mt);
-        this.company = company;
+class ScooterRequestResponder extends AchieveREResponder {
+    
+    ElectricScooterAgent scooter;
+    
+    public ScooterRequestResponder(ElectricScooterAgent scooter, MessageTemplate mt) {
+        super(scooter, mt);
+        this.scooter = scooter;
     }
 
     protected ACLMessage handleRequest(ACLMessage request) {
@@ -22,13 +23,14 @@ class CompanyClientRequestResponder extends AchieveREResponder {
     }
 
     public ACLMessage parseRequest(ACLMessage request) {
-        Utility.log(this.company, request);
+        Utility.log(this.scooter, request);
         ArrayList<String> message = Utility.parseMessage(request.getContent());
         switch (message.get(0)) {
-            case "GET-SCOOTER":
-                return parseGetScooter(message, request);
-            case "GET-STATION":
-                return parseGetStation(message, request);
+            case "DESTINATION":
+                return getDestinationInfo(message, request);
+            case "GO-TO":
+                return parseGoTo(message, request);
+
             default:
                 break;
         }
@@ -36,15 +38,15 @@ class CompanyClientRequestResponder extends AchieveREResponder {
         return request.createReply();
     }
 
-    private ACLMessage parseGetScooter(ArrayList<String> requestContents, ACLMessage request) {
+    private ACLMessage getDestinationInfo(ArrayList<String> requestContents, ACLMessage request) {
         Position position = Utility.parsePosition(requestContents.get(1));
         ACLMessage response = request.createReply();
         ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
-        message.setContent("NEAREST-SCOOTER=>" + position.getX() + "," + position.getY());
+        message.setContent("GET-STATION=>" + position.toString());
         try {
             response.setPerformative(ACLMessage.AGREE);
             response.setContent("Processing Request");
-            registerPrepareResultNotification(new CompanyScooterContractInitator(this.company, message, request));
+            registerPrepareResultNotification(new RequestStationInitiator(this.scooter, message, request));
         } catch (Exception e) {
             response.setPerformative(ACLMessage.NOT_UNDERSTOOD);
             response.setContent("Corrupted Command");
@@ -53,19 +55,18 @@ class CompanyClientRequestResponder extends AchieveREResponder {
         return response;
     }
 
-    private ACLMessage parseGetStation(ArrayList<String> requestContents, ACLMessage request) {
-        Position position = Utility.parsePosition(requestContents.get(1));
-
+    private ACLMessage parseGoTo(ArrayList<String> requestContents, ACLMessage request){
+        Position newScooterPosition = Utility.parseMessageWithPosition(request.getContent());
         ACLMessage response = request.createReply();
+        this.scooter.setPosition(newScooterPosition);
         try {
             response.setPerformative(ACLMessage.AGREE);
             response.setContent("Processing Request");
-            registerPrepareResultNotification(new CalculateNearestStation(this.company, request, position));
+            this.scooter.addBehaviour(new RequestPickUpResponder(this.scooter, new ACLMessage(ACLMessage.REQUEST)));
         } catch (Exception e) {
             response.setPerformative(ACLMessage.NOT_UNDERSTOOD);
             response.setContent("Corrupted Command");
         }
-
         return response;
     }
 

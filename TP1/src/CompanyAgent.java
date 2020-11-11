@@ -33,8 +33,7 @@ public class CompanyAgent extends Agent {
     public void setup() {
         yellowPagesService = new YellowPagesService(this, "company", companyName);
         yellowPagesService.register();
-        addBehaviour(new CompanyClientRequestResponder(this, MessageTemplate.MatchPerformative(ACLMessage.REQUEST)));
-        // addBehaviour(new RequestOther(this));
+        addBehaviour(new CompanyRequestResponder(this, MessageTemplate.MatchPerformative(ACLMessage.REQUEST)));
         System.out.println(getLocalName() + ": starting to work!");
     }
 

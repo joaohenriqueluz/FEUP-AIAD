@@ -50,6 +50,13 @@ public class Main {
                 AgentController client = mainContainer.acceptNewAgent(name, new ClientAgent(name));
                 client.start();
             }
+
+            for (int i = 0; i < 3; i++) {
+                String name = "worker_" + i;
+                AgentController worker = mainContainer.acceptNewAgent(name, new WorkerAgent(name));
+                worker.start();
+            }
+
         } catch (StaleProxyException e) {
             e.printStackTrace();
         }

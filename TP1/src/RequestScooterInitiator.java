@@ -7,11 +7,11 @@ import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.proto.AchieveREInitiator;
 
-class CompanyClientRequestInitiator extends AchieveREInitiator {
+class RequestScooterInitiator extends AchieveREInitiator {
     private int n = 0;
     ClientAgent client;
 
-    public CompanyClientRequestInitiator(ClientAgent client, ACLMessage msg) {
+    public RequestScooterInitiator(ClientAgent client, ACLMessage msg) {
         super(client, msg);
         this.client = client;
         // Request: GET-SCOOTER [Position]
@@ -27,12 +27,11 @@ class CompanyClientRequestInitiator extends AchieveREInitiator {
     }
 
     protected void handleAgree(ACLMessage agree) {
-        // ...
-        System.out.println(agree.getContent());
+        Utility.log(this.client, agree);
     }
 
     protected void handleRefuse(ACLMessage refuse) {
-        // ...
+        Utility.log(this.client, refuse);
     }
 
     protected void handleInform(ACLMessage inform) {
@@ -49,6 +48,6 @@ class CompanyClientRequestInitiator extends AchieveREInitiator {
     }
 
     protected void handleFailure(ACLMessage failure) {
-        // ...
+        Utility.log(this.client, failure);
     }
 }
