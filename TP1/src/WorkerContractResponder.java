@@ -42,13 +42,16 @@ public class WorkerContractResponder extends ContractNetResponder {
     }
 
     protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
+        Position stationPosition = Utility.parseMessageWithPosition(accept.getContent());
         System.out.println(this.worker.getLocalName() + " got an accept!");
         this.worker.setPosition(positionOfScooter);
         ACLMessage result = accept.createReply();
         result.setPerformative(ACLMessage.INFORM);
         result.setContent("IM-AT=>" + this.worker.getPosition().toString() + "--" + this.worker.getAID().getName());
         ACLMessage message = new ACLMessage();
-        message.setContent("CHARGE-AT=>");
+        message.setPerformative(ACLMessage.INFORM);
+        message.setContent("CHARGE-AT=>" + stationPosition.toString());
+        message.addReceiver(scooterAID);
         this.worker.send(message);
         // this.worker.addBehaviour(new ScooterRequestResponder(this.worker,
         // MessageTemplate.MatchPerformative(ACLMessage.REQUEST)));

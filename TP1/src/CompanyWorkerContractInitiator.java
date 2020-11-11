@@ -14,11 +14,14 @@ public class CompanyWorkerContractInitiator extends ContractNetInitiator {
     private int bestProposal = -1;
     private double bestDistance = -1;
     private ACLMessage request;
+    private Position stationPosition;
 
-    public CompanyWorkerContractInitiator(CompanyAgent a, ACLMessage msg, ACLMessage request) {
+    public CompanyWorkerContractInitiator(CompanyAgent a, ACLMessage msg, ACLMessage request,
+            Position stationPosition) {
         super(a, msg);
         this.company = a;
         this.request = request;
+        this.stationPosition = stationPosition;
     }
 
     protected Vector prepareCfps(ACLMessage cfp) {
@@ -55,6 +58,8 @@ public class CompanyWorkerContractInitiator extends ContractNetInitiator {
             }
             acceptances.add(msg);
         }
+
+        ((ACLMessage) acceptances.get(bestProposal)).setContent("STATION-AT=>" + stationPosition.toString());
     }
 
     protected void handleAllResultNotifications(Vector resultNotifications) {

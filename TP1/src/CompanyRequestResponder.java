@@ -79,7 +79,7 @@ class CompanyRequestResponder extends AchieveREResponder {
             if (!this.company.getNearestStation(position).equals(position)) {
                 response.setPerformative(ACLMessage.AGREE);
                 response.setContent("Finding available workers");
-                registerPrepareResultNotification(new CompanyWorkerContractInitiator(this.company, message, request));
+                registerPrepareResultNotification(new CompanyWorkerContractInitiator(this.company, message, request, position));
             } else {
                 response.setPerformative(ACLMessage.REFUSE);
                 response.setContent("Already in station, no need");

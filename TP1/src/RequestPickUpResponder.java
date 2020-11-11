@@ -20,7 +20,6 @@ class RequestPickUpResponder extends AchieveREInitiator {
 
     protected void handleAgree(ACLMessage agree) {
         Utility.log(this.scooter, agree);
-        this.scooter.setBusy(false);
     }
 
     protected void handleRefuse(ACLMessage refuse) {
@@ -32,15 +31,18 @@ class RequestPickUpResponder extends AchieveREInitiator {
         // ...
         Utility.log(this.scooter, inform);
         ACLMessage msg = this.scooter.receive();
-			if(msg != null) {
-				System.out.println(msg);
-				ACLMessage reply = msg.createReply();
-				reply.setPerformative(ACLMessage.INFORM);
-				reply.setContent("Got your message!");
-				this.scooter.send(reply);
-			} else {
-				block();
-			}
+        if (msg != null) {
+            ACLMessage reply = msg.createReply();
+            reply.setPerformative(ACLMessage.INFORM);
+            reply.setContent("Got your message!");
+            this.scooter.send(reply);
+        } else {
+            block();
+
+        }
+        Position newPosition = Utility.parseMessageWithPosition(msg.getContent());
+        this.scooter.setPosition(newPosition);
+        this.scooter.setBusy(false);
     }
 
     protected void handleFailure(ACLMessage failure) {
