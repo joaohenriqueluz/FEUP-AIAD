@@ -17,7 +17,6 @@ public class CompanyWorkerContractInitiator extends ContractNetInitiator {
 
     public CompanyWorkerContractInitiator(CompanyAgent a, ACLMessage msg, ACLMessage request) {
         super(a, msg);
-        System.out.println("Constructor CompanyWorkerContractInitiator");
         this.company = a;
         this.request = request;
     }

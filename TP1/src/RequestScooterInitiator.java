@@ -48,8 +48,6 @@ class RequestScooterInitiator extends AchieveREInitiator {
     }
 
     protected void handleFailure(ACLMessage failure) {
-        System.out.println("-----------------RECEIVED FAILURE ");
         Utility.log(this.client, failure);
-        System.out.println("VOU a pé");
     }
 }

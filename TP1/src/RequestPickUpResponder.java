@@ -10,7 +10,7 @@ class RequestPickUpResponder extends AchieveREInitiator {
     public RequestPickUpResponder(ElectricScooterAgent scooter, ACLMessage msg) {
         super(scooter, msg);
         this.scooter = scooter;
-        msg.setContent("PICK-UP=>" + this.scooter.getPosition().toString());
+        msg.setContent("PICK-UP=>" + this.scooter.getPosition().toString() + "--" + this.scooter.getAID().getName());
         AID companyAgent = this.scooter.getYellowPagesService().getAgentList("company")[0];
         System.out.println(companyAgent);
         if (companyAgent != null) {
@@ -31,17 +31,19 @@ class RequestPickUpResponder extends AchieveREInitiator {
     protected void handleInform(ACLMessage inform) {
         // ...
         Utility.log(this.scooter, inform);
-        // Position stationPosition =
-        // Utility.parseMessageWithPosition(inform.getContent());
-        // ACLMessage reply = inform.createReply();
-        // reply.setPerformative(ACLMessage.REQUEST);
-        // reply.setContent("GO-TO=>" + decision.toString());
-        // this.scooter.send(reply);
+        ACLMessage msg = this.scooter.receive();
+			if(msg != null) {
+				System.out.println(msg);
+				ACLMessage reply = msg.createReply();
+				reply.setPerformative(ACLMessage.INFORM);
+				reply.setContent("Got your message!");
+				this.scooter.send(reply);
+			} else {
+				block();
+			}
     }
 
     protected void handleFailure(ACLMessage failure) {
-        // ...
         Utility.log(this.scooter, failure);
-
     }
 }

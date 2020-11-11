@@ -1,6 +1,7 @@
 import jade.proto.ContractNetResponder;
 import java.util.ArrayList;
 import jade.core.Agent;
+import jade.core.AID;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -9,6 +10,7 @@ public class WorkerContractResponder extends ContractNetResponder {
 
     private WorkerAgent worker;
     private Position positionOfScooter;
+    private AID scooterAID;
 
     public WorkerContractResponder(WorkerAgent a, MessageTemplate mt) {
         super(a, mt);
@@ -23,6 +25,7 @@ public class WorkerContractResponder extends ContractNetResponder {
         double distance;
         switch (tokens.get(0)) {
             case "GET-WORKER":
+                scooterAID = new AID(tokens.get(2));
                 positionOfScooter = Utility.parsePosition(tokens.get(1));
                 distance = Utility.getEuclideanDistance(this.worker.getPosition(),positionOfScooter);
                 reply.setContent("" + distance);
@@ -44,6 +47,9 @@ public class WorkerContractResponder extends ContractNetResponder {
         ACLMessage result = accept.createReply();
         result.setPerformative(ACLMessage.INFORM);
         result.setContent("IM-AT=>" + this.worker.getPosition().toString() + "--" + this.worker.getAID().getName());
+        ACLMessage message = new ACLMessage();
+        message.setContent("CHARGE-AT=>");
+        this.worker.send(message);
         // this.worker.addBehaviour(new ScooterRequestResponder(this.worker,
         // MessageTemplate.MatchPerformative(ACLMessage.REQUEST)));
         return result;

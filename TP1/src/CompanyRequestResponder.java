@@ -73,7 +73,7 @@ class CompanyRequestResponder extends AchieveREResponder {
     private ACLMessage parsePickUp(ArrayList<String> requestContents, ACLMessage request) {
         Position position = Utility.parsePosition(requestContents.get(1));
         ACLMessage message = new ACLMessage(ACLMessage.CFP);
-        message.setContent("GET-WORKER=>" + position.toString());
+        message.setContent("GET-WORKER=>" + position.toString() + "--" + requestContents.get(2));
         ACLMessage response = request.createReply();
         try {
             if (!this.company.getNearestStation(position).equals(position)) {
