@@ -10,7 +10,10 @@ class RequestPickUpResponder extends AchieveREInitiator {
     public RequestPickUpResponder(ElectricScooterAgent scooter, ACLMessage msg) {
         super(scooter, msg);
         this.scooter = scooter;
-        msg.setContent("PICK-UP=>" + this.scooter.getPosition().toString() + "--" + this.scooter.getAID().getName());
+        Position start = this.scooter.getTripStartPosition();
+        Position end = this.scooter.getPosition();
+        double distance = Utility.getEuclideanDistance(start, end);
+        msg.setContent("PICK-UP=>" + this.scooter.getPosition().toString() + "--" + distance +"--" + this.scooter.getAID().getName());
         AID companyAgent = this.scooter.getYellowPagesService().getAgentList("company")[0];
         System.out.println(companyAgent);
         if (companyAgent != null) {
@@ -42,6 +45,7 @@ class RequestPickUpResponder extends AchieveREInitiator {
         }
         Position newPosition = Utility.parseMessageWithPosition(msg.getContent());
         this.scooter.setPosition(newPosition);
+        this.scooter.setTripStartPosition(newPosition);
         this.scooter.setBusy(false);
     }
 

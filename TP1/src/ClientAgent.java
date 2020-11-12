@@ -8,7 +8,11 @@ public class ClientAgent extends Agent {
     private String clientName;
     private Position position;
     private Position destination;
+    private double weatherWeight;
+    private double distanceWeight;
     private YellowPagesService yellowPagesService;
+    private double scooterPriceRate;
+    private double monetaryIncentive;
 
     public ClientAgent(String name) {
         clientName = name;
@@ -41,6 +45,22 @@ public class ClientAgent extends Agent {
         this.destination = newDestination;
     }
 
+    public void setScooterPriceRate(double scooterPriceRate) {
+        this.scooterPriceRate = scooterPriceRate;
+    }
+
+    public void setMonetaryIncentive(double monetaryIncentive) {
+        this.monetaryIncentive = monetaryIncentive;
+    }
+
+    public double getScooterPriceRate() {
+        return this.scooterPriceRate;
+    }
+
+    public double getMonetaryIncentive() {
+        return this.monetaryIncentive;
+    }
+
     public YellowPagesService getYellowPagesService() {
         return this.yellowPagesService;
     }
@@ -58,7 +78,15 @@ public class ClientAgent extends Agent {
     }
 
     public Position makeDecision(Position stationPosition) {
-        return Utility.getEuclideanDistance(destination, stationPosition) > 100 ? destination : stationPosition;
+        double distance = Utility.getEuclideanDistance(destination, stationPosition); // Distance of nearest station to
+                                                                                      // original destination;
+        double weather = Math.random();
+        double distanceWeight = Math.random() * (1 - 0.65) + 0.65;
+        double weatherWeight = 1 - distanceWeight;
+        double likelihoodDistance = Math.min(150 / (distance + 1), 1.0);
+        double likelihood = likelihoodDistance * distanceWeight + weather * weatherWeight;
+        double random = Math.random();
+        return random <= likelihood ? stationPosition : destination;
     }
 
     public void takeDown() {

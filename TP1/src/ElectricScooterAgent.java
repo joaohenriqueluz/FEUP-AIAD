@@ -8,12 +8,14 @@ public class ElectricScooterAgent extends Agent {
     private String scooterName;
     private int range;
     private Position position;
+    private Position tripStartPosition;
     private YellowPagesService yellowPagesService;
     private Boolean busy;
 
     public ElectricScooterAgent(String name, Position position) {
         scooterName = name;
         this.position = position;
+        this.tripStartPosition = position;
         busy = false;
     }
 
@@ -34,12 +36,10 @@ public class ElectricScooterAgent extends Agent {
     }
 
     public Boolean isBusy() {
-		// System.out.println(this.getLocalName() + " busy = " + this.busy);
         return this.busy;
     }
 
     public void setBusy(Boolean busy) {
-		// System.out.println(this.getLocalName() + " busy = " + this.busy);
         this.busy = busy;
     }
 
@@ -49,6 +49,14 @@ public class ElectricScooterAgent extends Agent {
 
     public void setPosition(Position position) {
         this.position = position;
+    }
+
+    public Position getTripStartPosition() {
+        return this.tripStartPosition;
+    }
+
+    public void setTripStartPosition(Position tripStartPosition) {
+        this.tripStartPosition = tripStartPosition;
     }
 
     public YellowPagesService getYellowPagesService() {

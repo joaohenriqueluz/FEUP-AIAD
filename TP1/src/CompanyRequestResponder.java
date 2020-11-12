@@ -45,7 +45,8 @@ class CompanyRequestResponder extends AchieveREResponder {
         message.setContent("NEAREST-SCOOTER=>" + position.toString());
         try {
             response.setPerformative(ACLMessage.AGREE);
-            response.setContent("Finding nearest available scooter for position " + position.toString());
+            response.setContent("Finding nearest available scooter=>" + this.company.getScooterPriceRate() + "--"
+                    + this.company.getMonetaryIncentive());
             registerPrepareResultNotification(new CompanyScooterContractInitator(this.company, message, request));
         } catch (Exception e) {
             response.setPerformative(ACLMessage.NOT_UNDERSTOOD);
@@ -71,21 +72,25 @@ class CompanyRequestResponder extends AchieveREResponder {
     }
 
     private ACLMessage parsePickUp(ArrayList<String> requestContents, ACLMessage request) {
-        Position position = Utility.parsePosition(requestContents.get(1));
+        Position scooterPosition = Utility.parsePosition(requestContents.get(1));
+        double scooterDistance = Double.parseDouble(requestContents.get(2));
+        String scooterAID = requestContents.get(3);
+        double tripPrice = 0;
         ACLMessage message = new ACLMessage(ACLMessage.CFP);
-        message.setContent("GET-WORKER=>" + position.toString() + "--" + requestContents.get(2));
+        message.setContent("GET-WORKER=>" + scooterPosition.toString() + "--" + scooterAID);
         ACLMessage response = request.createReply();
         try {
-            System.out.println("Comparing: "+ this.company.getNearestStation(position).toString()+" ==" +position.toString()+ 
-            "\nRESULT " + this.company.getNearestStation(position).equals(position));
-            if (!this.company.getNearestStation(position).equals(position)) {
-                this.company.updateNumberOfTrips(1);
+            System.out.println("Comparing: " + this.company.getNearestStation(scooterPosition).toString() + " =="
+                    + scooterPosition.toString() + "\nRESULT "
+                    + this.company.getNearestStation(scooterPosition).equals(scooterPosition));
+            if (!this.company.getNearestStation(scooterPosition).equals(scooterPosition)) {
+                this.company.updateNetIncome(scooterDistance);
                 response.setPerformative(ACLMessage.AGREE);
                 response.setContent("Finding available workers");
-                registerPrepareResultNotification(new CompanyWorkerContractInitiator(this.company, message, request, position));
+                registerPrepareResultNotification(
+                        new CompanyWorkerContractInitiator(this.company, message, request, scooterPosition));
             } else {
-                this.company.updateNumberOfSuccessfulTrips(1);
-                this.company.updateNumberOfTrips(1);
+                this.company.updateNetIncomeWithoutIncentive(scooterDistance);
                 response.setPerformative(ACLMessage.REFUSE);
                 response.setContent("Already in station, no need");
             }

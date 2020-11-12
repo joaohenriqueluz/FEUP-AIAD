@@ -11,11 +11,19 @@ public class CompanyAgent extends Agent {
     private YellowPagesService yellowPagesService;
     private int numberOfTrips;
     private int numberOfSuccessfulTrips;
+    private double staffTravelCost = 100;
+    private double scooterPriceRate = 100;
+    private double monetaryIncentive = 100;
+    private double netIncome;
+    private double operationCosts;
 
     public CompanyAgent(int numberOfStations, String name) {
         this.companyName = name;
         this.numberOfSuccessfulTrips = 0;
         this.numberOfTrips = 0;
+        this.netIncome = 0;
+        this.operationCosts = 0;
+
         chargingStationPositions = new ArrayList<Position>();
         for (int i = 0; i < numberOfStations; i++) {
             chargingStationPositions.add(new Position());
@@ -50,6 +58,41 @@ public class CompanyAgent extends Agent {
         this.numberOfTrips += numberOfTrips;
     }
 
+    public double getScooterPriceRate() {
+        return this.scooterPriceRate;
+    }
+
+    public double getMonetaryIncentive() {
+        return this.monetaryIncentive;
+    }
+
+    public double getStaffTravelCost() {
+        return this.staffTravelCost;
+    }
+
+    public double getNetIncome() {
+        return this.netIncome;
+    }
+
+    public void updateNetIncome(double distance) {
+        this.netIncome += distance * scooterPriceRate;
+        updateNumberOfTrips(1);
+    }
+
+    public void updateNetIncomeWithoutIncentive(double distance) {
+        this.netIncome += distance * scooterPriceRate - monetaryIncentive;
+        updateNumberOfSuccessfulTrips(1);
+        updateNumberOfTrips(1);
+    }
+
+    public double getOperationCosts() {
+        return this.operationCosts;
+    }
+
+    public void updateOperationCosts(double operationCosts) {
+        this.operationCosts += operationCosts;
+    }
+
     public void setup() {
         yellowPagesService = new YellowPagesService(this, "company", companyName);
         yellowPagesService.register();
@@ -73,13 +116,16 @@ public class CompanyAgent extends Agent {
     public void printTripsInfo() {
         System.out.println("Number of successful trips: " + numberOfSuccessfulTrips);
         System.out.println("Number of total trips: " + numberOfTrips);
-        Double percentageSuccessful = 0.0;
+        double percentageSuccessful = 0.0;
+        double averageIncomePerTrip = netIncome / numberOfTrips;
         String roundedPercentage = "";
         if (numberOfTrips != 0) {
             percentageSuccessful = numberOfSuccessfulTrips / (double) numberOfTrips * 100;
             roundedPercentage = String.format("%.2f", percentageSuccessful);
         }
         System.out.println("Percentage of successful trips: " + roundedPercentage + "%");
+        System.out.println("Average income per trip: " + averageIncomePerTrip);
+
     }
 
     public void takeDown() {

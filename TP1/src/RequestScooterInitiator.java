@@ -28,6 +28,9 @@ class RequestScooterInitiator extends AchieveREInitiator {
 
     protected void handleAgree(ACLMessage agree) {
         Utility.log(this.client, agree);
+        ArrayList<String> tokens = Utility.parseMessage(agree.getContent());
+        this.client.setScooterPriceRate(Double.parseDouble(tokens.get(1)));
+        this.client.setMonetaryIncentive(Double.parseDouble(tokens.get(2)));
     }
 
     protected void handleRefuse(ACLMessage refuse) {
