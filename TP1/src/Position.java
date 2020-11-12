@@ -1,35 +1,36 @@
 import java.util.Random;
+import java.util.Objects;
 
 public class Position {
 
-    private Integer x;
-    private Integer y;
+    private int x;
+    private int y;
 
-    public Integer getX() {
+    public int getX() {
         return this.x;
     }
 
-    public void setX(Integer x) {
+    public void setX(int x) {
         this.x = x;
     }
 
-    public Integer getY() {
+    public int getY() {
         return this.y;
     }
 
-    public void setY(Integer y) {
+    public void setY(int y) {
         this.y = y;
     }
 
-    public Position(Integer x, Integer y) {
+    public Position(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
     public Position() {
         Random rand = new Random();
-        this.x = rand.nextInt(20);
-        this.y = rand.nextInt(20);
+        this.x = rand.nextInt(1000);
+        this.y = rand.nextInt(1000);
     }
 
     public String toString() {
@@ -37,23 +38,20 @@ public class Position {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(Object o) {
+        if (this == o)
+            return true; // are the references equal
+        if (o == null)
+            return false; // is the other object null
+        if (getClass() != o.getClass())
+            return false; // both objects the same class
+        Position p = (Position) o; // cast the other object
+        return x == p.getX() && y == p.getY(); // actual comparison
+    }
 
-        if (obj == null) {
-            return false;
-        }
-
-        if (obj == this) {
-            return true;
-        }
-
-        if (!(obj instanceof Position)) {
-            return false;
-        }
-
-        Position c = (Position) obj;
-
-        return c.getY() == this.x && c.getY() == this.y;
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y);
     }
 
 }

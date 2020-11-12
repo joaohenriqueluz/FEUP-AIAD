@@ -6,7 +6,7 @@ import jade.lang.acl.MessageTemplate;
 public class ElectricScooterAgent extends Agent {
 
     private String scooterName;
-    private Integer range;
+    private int range;
     private Position position;
     private YellowPagesService yellowPagesService;
     private Boolean busy;
@@ -25,21 +25,21 @@ public class ElectricScooterAgent extends Agent {
         this.scooterName = scooterName;
     }
 
-    public Integer getRange() {
+    public int getRange() {
         return this.range;
     }
 
-    public void setRange(Integer range) {
+    public void setRange(int range) {
         this.range = range;
     }
 
     public Boolean isBusy() {
-		System.out.println(this.getLocalName() + " busy = " + this.busy);
+		// System.out.println(this.getLocalName() + " busy = " + this.busy);
         return this.busy;
     }
 
     public void setBusy(Boolean busy) {
-		System.out.println(this.getLocalName() + " busy = " + this.busy);
+		// System.out.println(this.getLocalName() + " busy = " + this.busy);
         this.busy = busy;
     }
 
@@ -66,8 +66,6 @@ public class ElectricScooterAgent extends Agent {
         // Add behavior
         // addBehaviour(new ElecticScooterREResponder(this,
         // MessageTemplate.MatchPerformative(ACLMessage.REQUEST)));
-        System.out.println("E-Scooter setup");
-
         addBehaviour(new CompanyScooterContractResponder(this, MessageTemplate.MatchPerformative(ACLMessage.CFP)));
     }
 

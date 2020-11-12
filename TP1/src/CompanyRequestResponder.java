@@ -76,11 +76,16 @@ class CompanyRequestResponder extends AchieveREResponder {
         message.setContent("GET-WORKER=>" + position.toString() + "--" + requestContents.get(2));
         ACLMessage response = request.createReply();
         try {
+            System.out.println("Comparing: "+ this.company.getNearestStation(position).toString()+" ==" +position.toString()+ 
+            "\nRESULT " + this.company.getNearestStation(position).equals(position));
             if (!this.company.getNearestStation(position).equals(position)) {
+                this.company.updateNumberOfTrips(1);
                 response.setPerformative(ACLMessage.AGREE);
                 response.setContent("Finding available workers");
                 registerPrepareResultNotification(new CompanyWorkerContractInitiator(this.company, message, request, position));
             } else {
+                this.company.updateNumberOfSuccessfulTrips(1);
+                this.company.updateNumberOfTrips(1);
                 response.setPerformative(ACLMessage.REFUSE);
                 response.setContent("Already in station, no need");
             }
@@ -88,6 +93,7 @@ class CompanyRequestResponder extends AchieveREResponder {
             response.setPerformative(ACLMessage.NOT_UNDERSTOOD);
             response.setContent("Corrupted Command");
         }
+        this.company.printTripsInfo();
         return response;
     }
 

@@ -58,7 +58,7 @@ public class ClientAgent extends Agent {
     }
 
     public Position makeDecision(Position stationPosition) {
-        return Utility.getEuclideanDistance(destination, stationPosition) > 10 ? destination : stationPosition;
+        return Utility.getEuclideanDistance(destination, stationPosition) > 100 ? destination : stationPosition;
     }
 
     public void takeDown() {

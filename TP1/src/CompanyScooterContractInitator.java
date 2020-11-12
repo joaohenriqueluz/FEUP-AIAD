@@ -64,11 +64,9 @@ public class CompanyScooterContractInitator extends ContractNetInitiator {
             response.setPerformative(ACLMessage.FAILURE);
             response.setContent("Could not find available scooters");
             if (this.parent != null) {
-                System.out.println("PARENT NOT NULL");
                 DataStore ds = getDataStore();
                 ds.put(((AchieveREResponder) parent).RESULT_NOTIFICATION_KEY, response);
             } else {
-                System.out.println("PARENT IS NULL");
                 this.company.send(response);
             }
         }

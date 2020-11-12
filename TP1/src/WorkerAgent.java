@@ -45,7 +45,6 @@ public class WorkerAgent extends Agent {
         yellowPagesService = new YellowPagesService(this, "worker", workerName);
         yellowPagesService.register();
         addBehaviour(new WorkerContractResponder(this, MessageTemplate.MatchPerformative(ACLMessage.CFP)));
-        // addBehaviour(new RequestOther(this));
         System.out.println(getLocalName() + ": starting to work!");
     }
 

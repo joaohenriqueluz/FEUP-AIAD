@@ -37,8 +37,8 @@ public class Utility {
 
     public static Position parsePosition(String message) {
         String[] coordenates = message.split(",");
-        Integer x = Integer.parseInt(coordenates[0]);
-        Integer y = Integer.parseInt(coordenates[1]);
+        int x = Integer.parseInt(coordenates[0]);
+        int y = Integer.parseInt(coordenates[1]);
         return (new Position(x, y));
     }
 
