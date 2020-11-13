@@ -78,14 +78,42 @@ public class ClientAgent extends Agent {
     }
 
     public Position makeDecision(Position stationPosition) {
-        double distance = Utility.getEuclideanDistance(destination, stationPosition); // Distance of nearest station to
-                                                                                      // original destination;
+        double destinationToStation = Utility.getEuclideanDistance(destination, stationPosition); // Distance of nearest
+                                                                                                  // station to original
+                                                                                                  // destination;
+        // a ----b----c
+        // b--a------c
+        // a----c-----b
+        // For money purposes
+        double positionToDestination = Utility.getEuclideanDistance(destination, this.position);
+        double positionToStation = Utility.getEuclideanDistance(stationPosition, this.position);
+        // Anda mais de scooter
+        double moneyLikelihood = 1;      
+        System.out.println("positionToDestination is " + positionToDestination + "\npositionToStation is " + positionToStation);
+
+        if (positionToDestination < positionToStation) {
+            System.out.println("Price is " + destinationToStation * scooterPriceRate);
+            if (monetaryIncentive < destinationToStation * scooterPriceRate) {
+                moneyLikelihood =  Math.random() * 0.3;
+            } else {
+                moneyLikelihood = Math.random() * (1 - 0.3) + 0.3;
+            }
+        }
+        System.out.println("moneyLikelihood: "+ moneyLikelihood);
+        // Faz o resto a pe
+        System.out.println("Monetary incentive is " + monetaryIncentive);
+        System.out.println("incentive is " + monetaryIncentive);
+
         double weather = Math.random();
-        double distanceWeight = Math.random() * (1 - 0.65) + 0.65;
-        double weatherWeight = 1 - distanceWeight;
-        double likelihoodDistance = Math.min(100 / (distance + 1), 1.0);
-        double likelihood = likelihoodDistance * distanceWeight + weather * weatherWeight;
+        double distanceWeight = Math.random() * (0.9 - 0.50) + 0.50;
+        double moneyWeight = Math.random() * (0.9 - distanceWeight) + 0.1;
+        double weatherWeight = 1 - distanceWeight - moneyWeight;
+        double likelihoodDistance = Math.min(100 / (destinationToStation + 1), 1.0);
+        double likelihood = likelihoodDistance * distanceWeight + moneyLikelihood * moneyWeight
+                + weather * weatherWeight;
         double random = Math.random();
+        System.out.println("distanceW : " + distanceWeight + " moneyW: " + moneyWeight + " weatherW: " + weatherWeight
+                + "  Total : " + (distanceWeight + moneyWeight + weatherWeight));
         return random <= likelihood ? stationPosition : destination;
     }
 

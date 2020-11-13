@@ -81,7 +81,6 @@ public class CompanyWorkerContractInitiator extends ContractNetInitiator {
                 this.company.send(response);
             }
         }
-
     }
 
 }
