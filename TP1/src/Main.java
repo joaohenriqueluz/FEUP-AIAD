@@ -58,15 +58,16 @@ public class Main {
         ContainerController mainContainer = rt.createMainContainer(p1);
 
         try {
-
-            AgentController company = mainContainer.acceptNewAgent("company",
-                    new CompanyAgent(1, "company_0", poiFlag, monetaryIncentive, staffTravelCost, scooterPriceRate));
+            CompanyAgent companyAgent = new CompanyAgent(10, "company_0", poiFlag, monetaryIncentive, staffTravelCost,
+                    scooterPriceRate);
+            AgentController company = mainContainer.acceptNewAgent("company", companyAgent);
             company.start();
 
+            ArrayList<Position> stationPositions = companyAgent.getChargingStationPositions();
             for (int i = 0; i < numberOfScooters; i++) {
                 String name = "electricScooter_" + i;
                 AgentController electricScooter = mainContainer.acceptNewAgent(name,
-                        new ElectricScooterAgent(name, new Position()));
+                        new ElectricScooterAgent(name, stationPositions.get(i / stationPositions.size())));
                 electricScooter.start();
             }
 
@@ -78,8 +79,15 @@ public class Main {
 
             for (int i = 0; i < numberOfWorkers; i++) {
                 String name = "worker_" + i;
-                AgentController worker = mainContainer.acceptNewAgent(name, new WorkerAgent(name));
-                worker.start();
+                if(poiFlag){
+                    AgentController worker = mainContainer.acceptNewAgent(name, new WorkerAgent(name, Utility.getPOICoordenates(i)));
+                    worker.start();
+                }
+                else{
+                    AgentController worker = mainContainer.acceptNewAgent(name, new WorkerAgent(name));
+                    worker.start();
+                }
+
             }
 
         } catch (StaleProxyException e) {

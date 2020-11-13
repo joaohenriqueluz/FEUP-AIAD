@@ -30,7 +30,7 @@ public class CompanyAgent extends Agent {
         chargingStationPositions = new ArrayList<Position>();
 
         if (stationAtPOIs) {
-            placeStationsAtPOIs(numberOfStations);
+            chargingStationPositions = Utility.placeStationsAtPOIs(numberOfStations);
             System.out.println("Placing at pois");
         } else {
             System.out.println("Placing at random positions");
@@ -38,12 +38,9 @@ public class CompanyAgent extends Agent {
                 chargingStationPositions.add(new Position());
             }
         }
-
-        // Saves the storage when the peer is interrupted
-        Runtime.getRuntime().addShutdownHook(new Thread(CompanyAgent::shutDown));
     }
 
-    public ArrayList getChargingStationPositions() {
+    public ArrayList<Position> getChargingStationPositions() {
         return chargingStationPositions;
     }
 
@@ -107,13 +104,6 @@ public class CompanyAgent extends Agent {
         this.operationCosts += distance * staffTravelCost;
     }
 
-    public void setup() {
-        yellowPagesService = new YellowPagesService(this, "company", companyName);
-        yellowPagesService.register();
-        addBehaviour(new CompanyRequestResponder(this, MessageTemplate.MatchPerformative(ACLMessage.REQUEST)));
-        System.out.println(getLocalName() + ": starting to work!");
-    }
-
     public Position getNearestStation(Position destination) {
         Position nearest = null;
         for (Position position : chargingStationPositions) {
@@ -143,12 +133,19 @@ public class CompanyAgent extends Agent {
         System.out.println("Average opration cost per trip: " + averageOperationCostPerTrip);
     }
 
+    public Position getRandomStation(){
+        int i = (int) Math.floor(Math.random() * (chargingStationPositions.size() - 1));
+        return chargingStationPositions.get(i);
+    }
+    
+    public void setup() {
+        yellowPagesService = new YellowPagesService(this, "company", companyName);
+        yellowPagesService.register();
+        addBehaviour(new CompanyRequestResponder(this, MessageTemplate.MatchPerformative(ACLMessage.REQUEST)));
+        System.out.println(getLocalName() + ": starting to work!");
+    }
+
     public void takeDown() {
         System.out.println(getLocalName() + ": done working.");
     }
-
-    public void placeStationsAtPOIs(int numberOfStations) {
-        chargingStationPositions = Utility.placeStationsAtPOIs(numberOfStations);
-    }
-
 }

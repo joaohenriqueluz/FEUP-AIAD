@@ -16,6 +16,11 @@ public class WorkerAgent extends Agent {
         position = new Position();
     }
 
+    public WorkerAgent(String name, Position position) {
+        workerName = name;
+        this.position = position;
+    }
+
     public String getWorkerName() {
         return this.workerName;
     }

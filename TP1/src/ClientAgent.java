@@ -78,6 +78,10 @@ public class ClientAgent extends Agent {
     }
 
     public Position makeDecision(Position stationPosition) {
+
+        if(stationPosition.equals(this.destination)){
+         return destination;
+        }
         double destinationToStation = Utility.getEuclideanDistance(destination, stationPosition); // Distance of nearest
                                                                                                   // station to original
                                                                                                   // destination;

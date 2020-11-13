@@ -35,11 +35,6 @@ public class Utility {
         return message;
     }
 
-    public static double chanceOfChargingStation(Position nearestChargingStation, Position destination,
-            int weatherQuality, int rushIndex) {
-        return (1 - (1 / Math.log10(getEuclideanDistance(nearestChargingStation, destination))));
-    }
-
     public static Position parsePosition(String message) {
         String[] coordenates = message.split(",");
         int x = Integer.parseInt(coordenates[0]);
@@ -69,11 +64,9 @@ public class Utility {
         double r = Math.random();
         Position destination;
         if (r < 0.5 && POIs.size() != 1) {
-            int i = (int) Math.floor(Math.random() * (POIs.size() - 1));
-            destination = POIs.get(i);
+            destination = getRandomPOI();
             while (destination.equals(startPosition)) {
-                i = (int) Math.floor(Math.random() * (POIs.size() - 1));
-                destination = POIs.get(i);
+                destination = getRandomPOI();
             }
             return destination;
         } else {
@@ -101,9 +94,19 @@ public class Utility {
         return positions;
     }
 
+    public static Position getPOICoordenates(int i) {
+        return POIs.get(i%POIs.size());
+    }
+
+    public static Position getRandomPOI(){
+        int i = (int) Math.floor(Math.random() * (POIs.size() - 1));
+        return POIs.get(i);
+    }
+
     public static void log(Agent a, ACLMessage message) {
-        System.out.println(
-                a.getLocalName() + " received: [" + message.getPerformative() + "] \"" + message.getContent() + "\"");
+        // System.out.println(
+        //         a.getLocalName() + " received: [" + message.getPerformative() + "] \"" + message.getContent() + "\"");
+        return;
     }
 
     public static ArrayList<Position> getPOIs() {
