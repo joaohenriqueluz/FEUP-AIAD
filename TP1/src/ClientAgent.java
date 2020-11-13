@@ -83,7 +83,7 @@ public class ClientAgent extends Agent {
         double weather = Math.random();
         double distanceWeight = Math.random() * (1 - 0.65) + 0.65;
         double weatherWeight = 1 - distanceWeight;
-        double likelihoodDistance = Math.min(150 / (distance + 1), 1.0);
+        double likelihoodDistance = Math.min(100 / (distance + 1), 1.0);
         double likelihood = likelihoodDistance * distanceWeight + weather * weatherWeight;
         double random = Math.random();
         return random <= likelihood ? stationPosition : destination;

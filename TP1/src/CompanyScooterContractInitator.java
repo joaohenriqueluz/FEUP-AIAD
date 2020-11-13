@@ -41,8 +41,8 @@ public class CompanyScooterContractInitator extends ContractNetInitiator {
 
         System.out.println("got " + responses.size() + " responses!");
         for (int i = 0; i < responses.size(); i++) {
+            ACLMessage msg = ((ACLMessage) responses.get(i)).createReply();
             if (((ACLMessage) responses.get(i)).getPerformative() == ACLMessage.PROPOSE) {
-                ACLMessage msg = ((ACLMessage) responses.get(i)).createReply();
                 double proposalDistance = Double.parseDouble(((ACLMessage) responses.get(i)).getContent());
                 if (bestProposal == -1) {
                     bestProposal = i;
@@ -56,8 +56,10 @@ public class CompanyScooterContractInitator extends ContractNetInitiator {
                 } else {
                     msg.setPerformative(ACLMessage.REJECT_PROPOSAL);
                 }
-                acceptances.add(msg);
+            } else {
+                msg.setPerformative(ACLMessage.REJECT_PROPOSAL);
             }
+            acceptances.add(msg);
         }
         if (acceptances.size() == 0) {
             ACLMessage response = this.request.createReply();

@@ -63,7 +63,7 @@ class ScooterRequestResponder extends AchieveREResponder {
         try {
             response.setPerformative(ACLMessage.AGREE);
             response.setContent("Processing Request");
-            this.scooter.addBehaviour(new RequestPickUpResponder(this.scooter, new ACLMessage(ACLMessage.REQUEST)));
+            this.scooter.addBehaviour(new RequestPickUpInitiator(this.scooter, new ACLMessage(ACLMessage.REQUEST)));
         } catch (Exception e) {
             response.setPerformative(ACLMessage.NOT_UNDERSTOOD);
             response.setContent("Corrupted Command");

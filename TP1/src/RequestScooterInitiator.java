@@ -39,7 +39,7 @@ class RequestScooterInitiator extends AchieveREInitiator {
 
     protected void handleInform(ACLMessage inform) {
         Utility.log(this.client, inform);
-        this.client.setDestination(Utility.getDestination());
+        this.client.setDestination(Utility.getDestination(this.client.getPosition()));
         ArrayList<String> parsed = Utility.parseMessage(inform.getContent());
         Position newClientPosition = Utility.parsePosition(parsed.get(1));
         AID scooterAID = new AID(parsed.get(2));

@@ -98,7 +98,6 @@ class CompanyRequestResponder extends AchieveREResponder {
             response.setPerformative(ACLMessage.NOT_UNDERSTOOD);
             response.setContent("Corrupted Command");
         }
-        this.company.printTripsInfo();
         return response;
     }
 

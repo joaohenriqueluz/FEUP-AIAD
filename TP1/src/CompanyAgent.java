@@ -11,22 +11,32 @@ public class CompanyAgent extends Agent {
     private YellowPagesService yellowPagesService;
     private int numberOfTrips;
     private int numberOfSuccessfulTrips;
-    private double staffTravelCost = 100;
-    private double scooterPriceRate = 100;
-    private double monetaryIncentive = 100;
+    private double staffTravelCost;
+    private double scooterPriceRate;
+    private double monetaryIncentive;
     private double netIncome;
     private double operationCosts;
 
-    public CompanyAgent(int numberOfStations, String name) {
+    public CompanyAgent(int numberOfStations, String name, Boolean stationAtPOIs, Double monetaryIncentive,
+            Double staffTravelCost, Double scooterPriceRate) {
         this.companyName = name;
         this.numberOfSuccessfulTrips = 0;
         this.numberOfTrips = 0;
         this.netIncome = 0;
         this.operationCosts = 0;
-
+        this.monetaryIncentive = monetaryIncentive;
+        this.scooterPriceRate = scooterPriceRate;
+        this.staffTravelCost = staffTravelCost;
         chargingStationPositions = new ArrayList<Position>();
-        for (int i = 0; i < numberOfStations; i++) {
-            chargingStationPositions.add(new Position());
+
+        if (stationAtPOIs) {
+            placeStationsAtPOIs(numberOfStations);
+            System.out.println("Placing at pois");
+        } else {
+            System.out.println("Placing at random positions");
+            for (int i = 0; i < numberOfStations; i++) {
+                chargingStationPositions.add(new Position());
+            }
         }
     }
 
@@ -89,8 +99,9 @@ public class CompanyAgent extends Agent {
         return this.operationCosts;
     }
 
-    public void updateOperationCosts(double operationCosts) {
-        this.operationCosts += operationCosts;
+    public void updateOperationCosts(double distance) {
+        System.out.println("Worker traveled " + distance);
+        this.operationCosts += distance * staffTravelCost;
     }
 
     public void setup() {
@@ -118,6 +129,7 @@ public class CompanyAgent extends Agent {
         System.out.println("Number of total trips: " + numberOfTrips);
         double percentageSuccessful = 0.0;
         double averageIncomePerTrip = netIncome / numberOfTrips;
+        double averageOperationCostPerTrip = operationCosts / numberOfTrips;
         String roundedPercentage = "";
         if (numberOfTrips != 0) {
             percentageSuccessful = numberOfSuccessfulTrips / (double) numberOfTrips * 100;
@@ -125,11 +137,15 @@ public class CompanyAgent extends Agent {
         }
         System.out.println("Percentage of successful trips: " + roundedPercentage + "%");
         System.out.println("Average income per trip: " + averageIncomePerTrip);
-
+        System.out.println("Average opration cost per trip: " + averageOperationCostPerTrip);
     }
 
     public void takeDown() {
         System.out.println(getLocalName() + ": done working.");
+    }
+
+    public void placeStationsAtPOIs(int numberOfStations) {
+        chargingStationPositions = Utility.placeStationsAtPOIs(numberOfStations);
     }
 
 }
