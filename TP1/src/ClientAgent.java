@@ -72,7 +72,7 @@ public class ClientAgent extends Agent {
     public void setup() {
         yellowPagesService = new YellowPagesService(this, "client", clientName);
         yellowPagesService.register();
-        addBehaviour(new RequestScooterInitiator(this, new ACLMessage(ACLMessage.REQUEST)));
+        addBehaviour(new ClientTickerBehaviour(this, 5000));
         // addBehaviour(new RequestOther(this));
         System.out.println(getLocalName() + ": starting to work!");
     }

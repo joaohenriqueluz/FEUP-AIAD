@@ -38,6 +38,9 @@ public class CompanyAgent extends Agent {
                 chargingStationPositions.add(new Position());
             }
         }
+
+        // Saves the storage when the peer is interrupted
+        Runtime.getRuntime().addShutdownHook(new Thread(CompanyAgent::shutDown));
     }
 
     public ArrayList getChargingStationPositions() {
