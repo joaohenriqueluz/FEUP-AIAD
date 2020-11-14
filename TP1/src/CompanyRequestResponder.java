@@ -80,9 +80,6 @@ class CompanyRequestResponder extends AchieveREResponder {
         message.setContent("GET-WORKER=>" + scooterPosition.toString() + "--" + scooterAID);
         ACLMessage response = request.createReply();
         try {
-            System.out.println("Comparing: " + this.company.getNearestStation(scooterPosition).toString() + " =="
-                    + scooterPosition.toString() + "\nRESULT "
-                    + this.company.getNearestStation(scooterPosition).equals(scooterPosition));
             if (!this.company.getNearestStation(scooterPosition).equals(scooterPosition)) {
                 this.company.updateNetIncome(scooterDistance);
                 response.setPerformative(ACLMessage.AGREE);
@@ -93,6 +90,7 @@ class CompanyRequestResponder extends AchieveREResponder {
                 this.company.updateNetIncomeWithoutIncentive(scooterDistance);
                 response.setPerformative(ACLMessage.REFUSE);
                 response.setContent("Already in station, no need");
+                this.company.printTripsInfo();
             }
         } catch (Exception e) {
             response.setPerformative(ACLMessage.NOT_UNDERSTOOD);

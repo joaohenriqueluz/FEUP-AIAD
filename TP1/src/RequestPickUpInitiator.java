@@ -17,7 +17,6 @@ class RequestPickUpInitiator extends AchieveREInitiator {
         msg.setContent("PICK-UP=>" + this.scooter.getPosition().toString() + "--" + distance + "--"
                 + this.scooter.getAID().getName());
         AID companyAgent = this.scooter.getYellowPagesService().getAgentList("company")[0];
-        System.out.println(companyAgent);
         if (companyAgent != null) {
             msg.addReceiver(companyAgent);
         }

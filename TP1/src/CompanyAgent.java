@@ -130,7 +130,7 @@ public class CompanyAgent extends Agent {
         }
         System.out.println("Percentage of successful trips: " + roundedPercentage + "%");
         System.out.println("Average income per trip: " + averageIncomePerTrip);
-        System.out.println("Average opration cost per trip: " + averageOperationCostPerTrip);
+        System.out.println("Average operation cost per trip: " + averageOperationCostPerTrip);
     }
 
     public Position getRandomStation(){

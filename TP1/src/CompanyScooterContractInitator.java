@@ -31,15 +31,13 @@ public class CompanyScooterContractInitator extends ContractNetInitiator {
                 cfp.addReceiver(scooterId);
             }
         }
-        System.out.println("After loop " + cfp.getContent());
-
         v.add(cfp);
         return v;
     }
 
     protected void handleAllResponses(Vector responses, Vector acceptances) {
 
-        System.out.println("got " + responses.size() + " responses!");
+        System.out.println(this.company.getLocalName() + " got " + responses.size() + " responses!");
         for (int i = 0; i < responses.size(); i++) {
             ACLMessage msg = ((ACLMessage) responses.get(i)).createReply();
             if (((ACLMessage) responses.get(i)).getPerformative() == ACLMessage.PROPOSE) {

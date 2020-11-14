@@ -83,11 +83,11 @@ public class Utility {
         Position position;
         for (int i = 0; i < length; i++) {
             if (i < POIs.size()) {
-                System.out.println("placing at POI: "+ POIs.get(i).toString());
+                System.out.println("placing at POI: " + POIs.get(i).toString());
                 positions.add(POIs.get(i));
             } else {
                 position = new Position();
-                System.out.println("placing at random position: "+ position);
+                System.out.println("placing at random position: " + position);
                 positions.add(position);
             }
         }
@@ -95,18 +95,17 @@ public class Utility {
     }
 
     public static Position getPOICoordenates(int i) {
-        return POIs.get(i%POIs.size());
+        return POIs.get(i % POIs.size());
     }
 
-    public static Position getRandomPOI(){
+    public static Position getRandomPOI() {
         int i = (int) Math.floor(Math.random() * (POIs.size() - 1));
         return POIs.get(i);
     }
 
     public static void log(Agent a, ACLMessage message) {
-        // System.out.println(
-        //         a.getLocalName() + " received: [" + message.getPerformative() + "] \"" + message.getContent() + "\"");
-        return;
+        System.out.println(
+                a.getLocalName() + " received: [" + message.getPerformative() + "] \"" + message.getContent() + "\"");
     }
 
     public static ArrayList<Position> getPOIs() {

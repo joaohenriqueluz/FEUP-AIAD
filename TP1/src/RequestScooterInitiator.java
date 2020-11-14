@@ -19,7 +19,7 @@ class RequestScooterInitiator extends AchieveREInitiator {
         msg.setContent(message);
         AID companyAgent = client.getYellowPagesService().getAgentList("company")[0];
         System.out.println(companyAgent);
-        System.out.println("Client Sent = " + msg.getContent());
+        System.out.println(this.client.getClientName() + " Sent = " + msg.getContent());
 
         if (companyAgent != null) {
             msg.addReceiver(companyAgent);
