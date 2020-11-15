@@ -1,15 +1,14 @@
-import jade.core.Agent;
-import java.util.ArrayList;
 import jade.core.AID;
-import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.DataStore;
 import jade.lang.acl.ACLMessage;
 import jade.proto.AchieveREInitiator;
 import jade.proto.AchieveREResponder;
-import jade.core.behaviours.DataStore;
+
+import java.util.ArrayList;
 
 class RequestStationInitiator extends AchieveREInitiator {
-    private int n = 0;
     ElectricScooterAgent scooter;
+    private int n = 0;
     private ACLMessage request;
 
     public RequestStationInitiator(ElectricScooterAgent scooter, ACLMessage msg, ACLMessage request) {

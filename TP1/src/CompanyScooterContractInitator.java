@@ -1,11 +1,11 @@
 import jade.core.AID;
-import jade.core.Agent;
+import jade.core.behaviours.DataStore;
 import jade.lang.acl.ACLMessage;
 import jade.proto.ContractNetInitiator;
+import jade.proto.SSIteratedAchieveREResponder;
+
 import java.util.ArrayList;
 import java.util.Vector;
-import jade.core.behaviours.DataStore;
-import jade.proto.SSIteratedAchieveREResponder;
 
 public class CompanyScooterContractInitator extends ContractNetInitiator {
 
@@ -24,7 +24,6 @@ public class CompanyScooterContractInitator extends ContractNetInitiator {
         Vector v = new Vector();
         cfp.setPerformative(ACLMessage.CFP);
         AID[] scooterAgents = company.getYellowPagesService().getAgentList("electic-scooter");
-        System.out.println(scooterAgents.length);
         if (scooterAgents != null) {
             for (AID scooterId : scooterAgents) {
                 cfp.addReceiver(scooterId);
@@ -36,7 +35,7 @@ public class CompanyScooterContractInitator extends ContractNetInitiator {
 
     protected void handleAllResponses(Vector responses, Vector acceptances) {
 
-        System.out.println(this.company.getLocalName() + " got " + responses.size() + " responses!");
+        System.out.println("** " + this.company.getLocalName() + " got " + responses.size() + " CFP responses form scooters! **");
         for (int i = 0; i < responses.size(); i++) {
             ACLMessage msg = ((ACLMessage) responses.get(i)).createReply();
             if (((ACLMessage) responses.get(i)).getPerformative() == ACLMessage.PROPOSE) {
@@ -58,7 +57,7 @@ public class CompanyScooterContractInitator extends ContractNetInitiator {
             }
             acceptances.add(msg);
         }
-        if (acceptances.size() == 0) {
+        if (bestProposal == -1) {
             ACLMessage response = this.request.createReply();
             response.setPerformative(ACLMessage.FAILURE);
             response.setContent("Could not find available scooters");

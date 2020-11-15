@@ -1,12 +1,11 @@
 import jade.core.AID;
-import jade.core.Agent;
+import jade.core.behaviours.DataStore;
 import jade.lang.acl.ACLMessage;
 import jade.proto.ContractNetInitiator;
+import jade.proto.SSIteratedAchieveREResponder;
 
 import java.util.ArrayList;
 import java.util.Vector;
-import jade.core.behaviours.DataStore;
-import jade.proto.SSIteratedAchieveREResponder;
 
 public class CompanyWorkerContractInitiator extends ContractNetInitiator {
 
@@ -28,7 +27,6 @@ public class CompanyWorkerContractInitiator extends ContractNetInitiator {
         Vector v = new Vector();
         cfp.setPerformative(ACLMessage.CFP);
         AID[] workerAgents = company.getYellowPagesService().getAgentList("worker");
-        System.out.println(workerAgents.length);
         if (workerAgents != null) {
             for (AID workerId : workerAgents) {
                 cfp.addReceiver(workerId);
@@ -40,7 +38,7 @@ public class CompanyWorkerContractInitiator extends ContractNetInitiator {
 
     protected void handleAllResponses(Vector responses, Vector acceptances) {
 
-        System.out.println("got " + responses.size() + " responses!");
+        System.out.println("** " + this.company.getLocalName() + " got " + responses.size() + " CFP responses from workers! **");
         for (int i = 0; i < responses.size(); i++) {
             ACLMessage msg = ((ACLMessage) responses.get(i)).createReply();
             if (((ACLMessage) responses.get(i)).getPerformative() == ACLMessage.PROPOSE) {
@@ -60,17 +58,6 @@ public class CompanyWorkerContractInitiator extends ContractNetInitiator {
             } else {
                 msg.setPerformative(ACLMessage.REJECT_PROPOSAL);
             }
-            if (acceptances.size() == 0) {
-                ACLMessage response = this.request.createReply();
-                response.setPerformative(ACLMessage.FAILURE);
-                response.setContent("Could not find available workers");
-                if (this.parent != null) {
-                    DataStore ds = getDataStore();
-                    ds.put(((SSIteratedAchieveREResponder) parent).REPLY_KEY, response);
-                } else {
-                    this.company.send(response);
-                }
-            }
             acceptances.add(msg);
         }
         if (bestProposal > -1) {
@@ -79,7 +66,18 @@ public class CompanyWorkerContractInitiator extends ContractNetInitiator {
                     .updateOperationCosts(bestDistance + Utility.getEuclideanDistance(nearestStation, scooterPosition));
             this.company.printTripsInfo();
             ((ACLMessage) acceptances.get(bestProposal)).setContent("STATION-AT=>" + nearestStation.toString());
+        } else {
+            ACLMessage response = this.request.createReply();
+            response.setPerformative(ACLMessage.FAILURE);
+            response.setContent("Could not find available workers");
+            if (this.parent != null) {
+                DataStore ds = getDataStore();
+                ds.put(((SSIteratedAchieveREResponder) parent).REPLY_KEY, response);
+            } else {
+                this.company.send(response);
+            }
         }
+
     }
 
     protected void handleAllResultNotifications(Vector resultNotifications) {

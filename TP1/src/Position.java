@@ -1,10 +1,21 @@
-import java.util.Random;
 import java.util.Objects;
+import java.util.Random;
 
 public class Position {
 
     private int x;
     private int y;
+
+    public Position(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public Position() {
+        Random rand = new Random();
+        this.x = rand.nextInt(1000);
+        this.y = rand.nextInt(1000);
+    }
 
     public int getX() {
         return this.x;
@@ -20,17 +31,6 @@ public class Position {
 
     public void setY(int y) {
         this.y = y;
-    }
-
-    public Position(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    public Position() {
-        Random rand = new Random();
-        this.x = rand.nextInt(1000);
-        this.y = rand.nextInt(1000);
     }
 
     public String toString() {

@@ -1,7 +1,4 @@
 import jade.core.Agent;
-import jade.core.AID;
-import jade.core.behaviours.Behaviour;
-import jade.lang.acl.ACLMessage;
 
 public class ClientAgent extends Agent {
 
@@ -33,10 +30,20 @@ public class ClientAgent extends Agent {
         return this.position;
     }
 
+    public void setPosition(Position newPosition) {
+        System.out.println("** " + getLocalName() + " new position is " + newPosition.toString() + " **");
+        this.position = newPosition;
+    }
+
     public Position getDestination() {
         return this.destination;
     }
- 
+
+    public void setDestination(Position newDestination) {
+        System.out.println("** " + getLocalName() + " new destination is " + newDestination.toString() + " **");
+        this.destination = newDestination;
+    }
+
     public Boolean isBusy() {
         return this.busy;
     }
@@ -45,30 +52,20 @@ public class ClientAgent extends Agent {
         this.busy = busy;
     }
 
-    public void setPosition(Position newPosition) {
-        System.out.println(getLocalName() + " new position is " + newPosition.toString());
-        this.position = newPosition;
-    }
-
-    public void setDestination(Position newDestination) {
-        System.out.println(getLocalName() + " new destination is " + newDestination.toString());
-        this.destination = newDestination;
+    public double getScooterPriceRate() {
+        return this.scooterPriceRate;
     }
 
     public void setScooterPriceRate(double scooterPriceRate) {
         this.scooterPriceRate = scooterPriceRate;
     }
 
-    public void setMonetaryIncentive(double monetaryIncentive) {
-        this.monetaryIncentive = monetaryIncentive;
-    }
-
-    public double getScooterPriceRate() {
-        return this.scooterPriceRate;
-    }
-
     public double getMonetaryIncentive() {
         return this.monetaryIncentive;
+    }
+
+    public void setMonetaryIncentive(double monetaryIncentive) {
+        this.monetaryIncentive = monetaryIncentive;
     }
 
     public YellowPagesService getYellowPagesService() {
@@ -82,42 +79,31 @@ public class ClientAgent extends Agent {
     public void setup() {
         yellowPagesService = new YellowPagesService(this, "client", clientName);
         yellowPagesService.register();
-        addBehaviour(new ClientTickerBehaviour(this, 500));
-        // addBehaviour(new RequestOther(this));
-        System.out.println(getLocalName() + ": starting to work!");
+        addBehaviour(new ClientTickerBehaviour(this, 2000));
+        System.out.println("** " + getLocalName() + ": starting to work! **");
     }
 
     public Position makeDecision(Position stationPosition) {
 
-        if(stationPosition.equals(this.destination)){
-         return destination;
+        if (stationPosition.equals(this.destination)) {
+            return destination;
         }
-        
+
         double destinationToStation = Utility.getEuclideanDistance(destination, stationPosition); // Distance of nearest
-                                                                                                  // station to original
-                                                                                                  // destination;
-        // a ----b----c
-        // b--a------c
-        // a----c-----b
+        // station to original
+        // destination;
         // For money purposes
         double positionToDestination = Utility.getEuclideanDistance(destination, this.position);
         double positionToStation = Utility.getEuclideanDistance(stationPosition, this.position);
         // Anda mais de scooter
-        double moneyLikelihood = 1;      
-        System.out.println("positionToDestination is " + positionToDestination + "\npositionToStation is " + positionToStation);
-
+        double moneyLikelihood = 1;
         if (positionToDestination < positionToStation) {
-            System.out.println("Price is " + destinationToStation * scooterPriceRate);
             if (monetaryIncentive < destinationToStation * scooterPriceRate) {
-                moneyLikelihood =  Math.random() * 0.3;
+                moneyLikelihood = Math.random() * 0.3;
             } else {
                 moneyLikelihood = Math.random() * (1 - 0.3) + 0.3;
             }
         }
-        System.out.println("moneyLikelihood: "+ moneyLikelihood);
-        // Faz o resto a pe
-        System.out.println("Monetary incentive is " + monetaryIncentive);
-        System.out.println("incentive is " + monetaryIncentive);
 
         double weather = Math.random();
         double distanceWeight = Math.random() * (0.9 - 0.50) + 0.50;
@@ -127,12 +113,10 @@ public class ClientAgent extends Agent {
         double likelihood = likelihoodDistance * distanceWeight + moneyLikelihood * moneyWeight
                 + weather * weatherWeight;
         double random = Math.random();
-        System.out.println("distanceW : " + distanceWeight + " moneyW: " + moneyWeight + " weatherW: " + weatherWeight
-                + "  Total : " + (distanceWeight + moneyWeight + weatherWeight));
         return random <= likelihood ? stationPosition : destination;
     }
 
     public void takeDown() {
-        System.out.println(getLocalName() + ": done working.");
+        System.out.println("** " + getLocalName() + ": done working. **");
     }
 }

@@ -12,7 +12,7 @@ public class YellowPagesService {
     private Agent agent;
 
     public YellowPagesService(Agent agent, String type, String name) {
-        this.agent = (Agent) agent;
+        this.agent = agent;
         this.type = type;
         this.name = name;
     }

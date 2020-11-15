@@ -1,8 +1,6 @@
 import jade.core.behaviours.Behaviour;
-import jade.core.Agent;
-import jade.core.AID;
-import jade.lang.acl.ACLMessage;
 import jade.core.behaviours.DataStore;
+import jade.lang.acl.ACLMessage;
 import jade.proto.SSIteratedAchieveREResponder;
 
 public class CalculateNearestStation extends Behaviour {

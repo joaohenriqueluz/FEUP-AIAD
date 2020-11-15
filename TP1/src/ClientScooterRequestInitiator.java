@@ -1,6 +1,3 @@
-import jade.core.Agent;
-import jade.core.AID;
-import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.proto.AchieveREInitiator;
 
@@ -14,7 +11,6 @@ class ClientScooterRequestInitiator extends AchieveREInitiator {
 
     protected void handleAgree(ACLMessage agree) {
         Utility.log(this.client, agree);
-        System.out.println(agree.getContent());
     }
 
     protected void handleRefuse(ACLMessage refuse) {

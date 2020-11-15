@@ -1,10 +1,9 @@
-import jade.proto.ContractNetResponder;
-import java.util.ArrayList;
-import jade.core.Agent;
 import jade.core.AID;
-import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.proto.ContractNetResponder;
+
+import java.util.ArrayList;
 
 public class WorkerContractResponder extends ContractNetResponder {
 
@@ -14,7 +13,6 @@ public class WorkerContractResponder extends ContractNetResponder {
 
     public WorkerContractResponder(WorkerAgent worker, MessageTemplate mt) {
         super(worker, mt);
-        System.out.println("Constructor WorkerContractResponder");
         this.worker = worker;
     }
 
@@ -23,9 +21,7 @@ public class WorkerContractResponder extends ContractNetResponder {
         ACLMessage reply = cfp.createReply();
         ArrayList<String> tokens = Utility.parseMessage(cfp.getContent());
         double distance;
-        System.out.println("\n\n\n" + worker.getLocalName()+ "BUSY: "+ this.worker.isBusy()+ "\n\n\n");
         if (!this.worker.isBusy()) {
-            System.out.println(this.worker.getLocalName() + " is NOT Busy");
             switch (tokens.get(0)) {
                 case "GET-WORKER":
                     scooterAID = new AID(tokens.get(2));
@@ -37,8 +33,7 @@ public class WorkerContractResponder extends ContractNetResponder {
                 default:
                     break;
             }
-        }else{
-            System.out.println(this.worker.getLocalName() + " is Busy");
+        } else {
             reply.setPerformative(ACLMessage.REFUSE);
         }
         return reply;

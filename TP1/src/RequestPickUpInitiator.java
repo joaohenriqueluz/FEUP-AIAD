@@ -1,9 +1,8 @@
-import java.util.ArrayList;
-import jade.core.Agent;
 import jade.core.AID;
-import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.proto.AchieveREInitiator;
+
+import java.util.ArrayList;
 
 class RequestPickUpInitiator extends AchieveREInitiator {
     ElectricScooterAgent scooter;

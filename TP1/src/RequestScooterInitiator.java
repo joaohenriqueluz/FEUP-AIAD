@@ -1,15 +1,12 @@
-import jade.core.Agent;
-
-import java.util.ArrayList;
-
 import jade.core.AID;
-import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.proto.AchieveREInitiator;
 
+import java.util.ArrayList;
+
 class RequestScooterInitiator extends AchieveREInitiator {
-    private int n = 0;
     ClientAgent client;
+    private int n = 0;
 
     public RequestScooterInitiator(ClientAgent client, ACLMessage msg) {
         super(client, msg);
@@ -19,9 +16,6 @@ class RequestScooterInitiator extends AchieveREInitiator {
         String message = "GET-SCOOTER=>" + this.client.getPosition().toString();
         msg.setContent(message);
         AID companyAgent = client.getYellowPagesService().getAgentList("company")[0];
-        System.out.println(companyAgent);
-        System.out.println(this.client.getClientName() + " Sent = " + msg.getContent());
-
         if (companyAgent != null) {
             msg.addReceiver(companyAgent);
         }

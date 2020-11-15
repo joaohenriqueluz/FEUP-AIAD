@@ -1,14 +1,11 @@
-import jade.core.ProfileImpl;
 import jade.core.Profile;
+import jade.core.ProfileImpl;
 import jade.core.Runtime;
-import jade.wrapper.AgentContainer;
-import jade.wrapper.ContainerController;
 import jade.wrapper.AgentController;
+import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
-import java.io.*;
+
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.Random;
 
 public class Main {
 
@@ -79,11 +76,10 @@ public class Main {
 
             for (int i = 0; i < numberOfWorkers; i++) {
                 String name = "worker_" + i;
-                if(poiFlag){
+                if (poiFlag) {
                     AgentController worker = mainContainer.acceptNewAgent(name, new WorkerAgent(name, Utility.getPOICoordenates(i)));
                     worker.start();
-                }
-                else{
+                } else {
                     AgentController worker = mainContainer.acceptNewAgent(name, new WorkerAgent(name));
                     worker.start();
                 }

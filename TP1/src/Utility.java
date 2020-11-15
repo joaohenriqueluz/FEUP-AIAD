@@ -1,9 +1,8 @@
-import java.lang.Math;
+import jade.core.Agent;
+import jade.lang.acl.ACLMessage;
+
 import java.util.ArrayList;
 import java.util.Arrays;
-import jade.core.Agent;
-import jade.core.AID;
-import jade.lang.acl.ACLMessage;
 
 public class Utility {
     private static ArrayList<Position> POIs = new ArrayList<Position>(

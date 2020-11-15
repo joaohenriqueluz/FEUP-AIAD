@@ -1,12 +1,7 @@
-import java.util.ArrayList;
-import jade.core.Agent;
-import jade.core.AID;
-import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
-import jade.proto.AchieveREResponder;
-import jade.lang.acl.MessageTemplate;
-import jade.core.behaviours.DataStore;
 import jade.proto.SSIteratedAchieveREResponder;
+
+import java.util.ArrayList;
 
 class CompanyRequestResponder extends SSIteratedAchieveREResponder {
     CompanyAgent company;

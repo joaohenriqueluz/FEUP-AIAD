@@ -1,10 +1,10 @@
-import java.util.ArrayList;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.proto.SSResponderDispatcher; 
+import jade.proto.SSResponderDispatcher;
 
+import java.util.ArrayList;
 
 public class CompanyAgent extends Agent {
 
@@ -100,7 +100,6 @@ public class CompanyAgent extends Agent {
     }
 
     public synchronized void updateOperationCosts(double distance) {
-        System.out.println("Worker traveled " + distance);
         this.operationCosts += distance * staffTravelCost;
     }
 
@@ -118,6 +117,7 @@ public class CompanyAgent extends Agent {
     }
 
     public void printTripsInfo() {
+        System.out.println("----------------------------------------------------------");
         System.out.println("Number of successful trips: " + numberOfSuccessfulTrips);
         System.out.println("Number of total trips: " + numberOfTrips);
         double percentageSuccessful = 0.0;
@@ -131,6 +131,7 @@ public class CompanyAgent extends Agent {
         System.out.println("Percentage of successful trips: " + roundedPercentage + "%");
         System.out.println("Average income per trip: " + averageIncomePerTrip);
         System.out.println("Average operation cost per trip: " + averageOperationCostPerTrip);
+        System.out.println("----------------------------------------------------------");
     }
 
     public Position getRandomStation() {
@@ -142,17 +143,18 @@ public class CompanyAgent extends Agent {
         yellowPagesService = new YellowPagesService(this, "company", companyName);
         yellowPagesService.register();
         MessageTemplate template = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
-         addBehaviour(new SSResponderDispatcher(this, template) {
-             @Override
-             protected Behaviour createResponder(ACLMessage request) {
-                 return new CompanyRequestResponder(((CompanyAgent) this.getAgent()), request);
-             }
-            });
-        // addBehaviour(new CompanyRequestResponder(this, MessageTemplate.MatchPerformative(ACLMessage.REQUEST)));
-        System.out.println(getLocalName() + ": starting to work!");
+        addBehaviour(new SSResponderDispatcher(this, template) {
+            @Override
+            protected Behaviour createResponder(ACLMessage request) {
+                return new CompanyRequestResponder(((CompanyAgent) this.getAgent()), request);
+            }
+        });
+        // addBehaviour(new CompanyRequestResponder(this,
+        // MessageTemplate.MatchPerformative(ACLMessage.REQUEST)));
+        System.out.println("** " + getLocalName() + ": starting to work! **");
     }
 
     public void takeDown() {
-        System.out.println(getLocalName() + ": done working.");
+        System.out.println("** " + getLocalName() + ": done working. **");
     }
 }

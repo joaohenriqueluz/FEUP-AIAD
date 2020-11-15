@@ -1,7 +1,5 @@
 import jade.core.Agent;
-import jade.core.AID;
 import jade.lang.acl.ACLMessage;
-import jade.core.behaviours.Behaviour;
 import jade.lang.acl.MessageTemplate;
 
 public class WorkerAgent extends Agent {
@@ -37,7 +35,7 @@ public class WorkerAgent extends Agent {
     }
 
     public void setPosition(Position newPosition) {
-        System.out.println(getLocalName() + " new position is " + newPosition.toString());
+        System.out.println("** " + getLocalName() + " new position is " + newPosition.toString() + " **");
         this.position = newPosition;
     }
 
@@ -61,10 +59,10 @@ public class WorkerAgent extends Agent {
         yellowPagesService = new YellowPagesService(this, "worker", workerName);
         yellowPagesService.register();
         addBehaviour(new WorkerContractResponder(this, MessageTemplate.MatchPerformative(ACLMessage.CFP)));
-        System.out.println(getLocalName() + ": starting to work!");
+        System.out.println("** " + getLocalName() + ": starting to work! **");
     }
 
     public void takeDown() {
-        System.out.println(getLocalName() + ": done working.");
+        System.out.println("** " + getLocalName() + ": done working. **");
     }
 }
