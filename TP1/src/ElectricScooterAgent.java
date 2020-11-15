@@ -47,6 +47,7 @@ public class ElectricScooterAgent extends Agent {
     }
 
     public void setPosition(Position position) {
+        System.out.println("** " + getLocalName() + " new position is " + position.toString() + " **");
         this.position = position;
     }
 

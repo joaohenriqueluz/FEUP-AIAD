@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Utility {
+    private static Boolean verbose = false;
     private static ArrayList<Position> POIs = new ArrayList<Position>(
             Arrays.asList(new Position(), new Position(), new Position(), new Position(), new Position(),
                     new Position(), new Position(), new Position(), new Position(), new Position(), new Position(),
@@ -12,6 +13,14 @@ public class Utility {
 
     public static double getEuclideanDistance(Position p1, Position p2) {
         return Math.sqrt(Math.pow(p1.getX() - p2.getX(), 2) + Math.pow(p1.getY() - p2.getY(), 2));
+    }
+
+    public static void setVerbose(Boolean verboseOp) {
+        verbose = verboseOp;
+    }
+
+    public static Boolean getVerbose() {
+        return verbose;
     }
 
     public static Position parsePosition(String message) {
@@ -83,8 +92,10 @@ public class Utility {
     }
 
     public static void log(Agent a, ACLMessage message) {
-        System.out.println(
-                a.getLocalName() + " received: [" + message.getPerformative() + "] \"" + message.getContent() + "\"");
+        if (verbose) {
+            System.out.println(a.getLocalName() + " received: [" + message.getPerformative() + "] \""
+                    + message.getContent() + "\"");
+        }
     }
 
     public static ArrayList<Position> getPOIs() {

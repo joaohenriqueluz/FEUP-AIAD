@@ -41,11 +41,15 @@ public class CompanyScooterContractResponder extends ContractNetResponder {
     }
 
     protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage reject) {
-        System.out.println(this.scooter.getLocalName() + " got a reject...");
+        if (Utility.getVerbose()) {
+            System.out.println(this.scooter.getLocalName() + " got a reject...");
+        }
     }
 
     protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
-        System.out.println(this.scooter.getLocalName() + " got an accept!");
+        if (Utility.getVerbose()) {
+            System.out.println(this.scooter.getLocalName() + " got an accept!");
+        }
         ACLMessage result = accept.createReply();
         result.setPerformative(ACLMessage.INFORM);
         result.setContent("IM-AT=>" + this.scooter.getPosition().toString() + "--" + this.scooter.getAID().getName());

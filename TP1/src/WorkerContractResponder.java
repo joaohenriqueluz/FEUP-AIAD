@@ -40,13 +40,16 @@ public class WorkerContractResponder extends ContractNetResponder {
     }
 
     protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage reject) {
-        System.out.println(this.worker.getLocalName() + " got a reject...");
+        if (Utility.getVerbose()) {
+            System.out.println(this.worker.getLocalName() + " got a reject...");
+        }
     }
 
     protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
         Position stationPosition = Utility.parseMessageWithPosition(accept.getContent());
-        System.out.println(this.worker.getLocalName() + " got an accept!");
-        this.worker.setPosition(positionOfScooter);
+        if (Utility.getVerbose()) {
+            System.out.println(this.worker.getLocalName() + " got an accept!");
+        }
         this.worker.setBusy(true);
         ACLMessage result = accept.createReply();
         result.setPerformative(ACLMessage.INFORM);
@@ -57,8 +60,7 @@ public class WorkerContractResponder extends ContractNetResponder {
         message.addReceiver(scooterAID);
         this.worker.send(message);
         this.worker.setBusy(false);
-        // this.worker.addBehaviour(new ScooterRequestResponder(this.worker,
-        // MessageTemplate.MatchPerformative(ACLMessage.REQUEST)));
+        this.worker.setPosition(stationPosition);
         return result;
     }
 

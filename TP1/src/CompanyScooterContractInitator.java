@@ -35,7 +35,10 @@ public class CompanyScooterContractInitator extends ContractNetInitiator {
 
     protected void handleAllResponses(Vector responses, Vector acceptances) {
 
-        System.out.println("** " + this.company.getLocalName() + " got " + responses.size() + " CFP responses form scooters! **");
+        if (Utility.getVerbose()) {
+            System.out.println("** " + this.company.getLocalName() + " got " + responses.size()
+                    + " CFP responses form scooters! **");
+        }
         for (int i = 0; i < responses.size(); i++) {
             ACLMessage msg = ((ACLMessage) responses.get(i)).createReply();
             if (((ACLMessage) responses.get(i)).getPerformative() == ACLMessage.PROPOSE) {

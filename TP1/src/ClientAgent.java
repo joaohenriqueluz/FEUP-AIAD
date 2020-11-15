@@ -13,9 +13,9 @@ public class ClientAgent extends Agent {
     private Boolean busy;
 
     public ClientAgent(String name) {
-        clientName = name;
-        position = new Position();
-        busy = false;
+        this.clientName = name;
+        this.position = new Position();
+        this.busy = false;
     }
 
     public String getClientName() {
@@ -95,8 +95,11 @@ public class ClientAgent extends Agent {
         // For money purposes
         double positionToDestination = Utility.getEuclideanDistance(destination, this.position);
         double positionToStation = Utility.getEuclideanDistance(stationPosition, this.position);
-        // Anda mais de scooter
         double moneyLikelihood = 1;
+
+        if (monetaryIncentive == 0)
+            moneyLikelihood = 0;
+
         if (positionToDestination < positionToStation) {
             if (monetaryIncentive < destinationToStation * scooterPriceRate) {
                 moneyLikelihood = Math.random() * 0.3;
@@ -105,11 +108,14 @@ public class ClientAgent extends Agent {
             }
         }
 
+        double fitness = Math.random() * (1 - 0.4) + 0.4;
         double weather = Math.random();
-        double distanceWeight = Math.random() * (0.9 - 0.50) + 0.50;
-        double moneyWeight = Math.random() * (0.9 - distanceWeight) + 0.1;
+        double distanceWeight = Math.random() * (0.8 - 0.50) + 0.50;
+        double moneyWeight = Math.random() * (0.8 - distanceWeight) + 0.1;
+        if (monetaryIncentive == 0)
+            moneyWeight = 0;
         double weatherWeight = 1 - distanceWeight - moneyWeight;
-        double likelihoodDistance = Math.min(100 / (destinationToStation + 1), 1.0);
+        double likelihoodDistance = fitness * (Math.min(150 / (destinationToStation + 1), 1.0));
         double likelihood = likelihoodDistance * distanceWeight + moneyLikelihood * moneyWeight
                 + weather * weatherWeight;
         double random = Math.random();

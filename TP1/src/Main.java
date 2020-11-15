@@ -4,6 +4,7 @@ import jade.core.Runtime;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
+import jdk.jshell.execution.Util;
 
 import java.util.ArrayList;
 
@@ -18,37 +19,31 @@ public class Main {
         int numberOfClients = 0;
         int numberOfScooters = 0;
         int numberOfWorkers = 0;
+        int argIndex = 0;
 
-        if (args.length > 7 || args.length < 6) {
+        if (args.length > 8 || args.length < 6) {
             System.err.println(
-                    "Incorrect command. Try: java Main [-p] <monetary_incentive> <staff_travel_cost> <scooter_price_rate> <number_of_clients> <number_of_scooter> <number_of_workers> ");
+                    "Incorrect command. Try: java Main [-p] [-v] <monetary_incentive> <staff_travel_cost> <scooter_price_rate> <number_of_clients> <number_of_scooter> <number_of_workers> ");
             return;
         }
 
-        if (args.length == 7) {
-            if (args[0].equals("-p")) {
+        for (String arg : args) {
+            if (arg.equals("-p")) {
                 poiFlag = true;
-                monetaryIncentive = Double.parseDouble(args[1]);
-                staffTravelCost = Double.parseDouble(args[2]);
-                scooterPriceRate = Double.parseDouble(args[3]);
-
-                numberOfClients = Integer.parseInt(args[4]);
-                numberOfScooters = Integer.parseInt(args[5]);
-                numberOfWorkers = Integer.parseInt(args[6]);
-            } else {
-                System.err.println(
-                        "Incorrect command. Try: java Main [-p] <monetary_incentive> <staff_travel_cost> <scooter_price_rate> <number_of_clients> <number_of_scooter> <number_of_workers> ");
-                return;
+                argIndex++;
+            } else if (arg.equals("-v")) {
+                Utility.setVerbose(true);
+                argIndex++;
             }
-        } else {
-            monetaryIncentive = Double.parseDouble(args[0]);
-            staffTravelCost = Double.parseDouble(args[1]);
-            scooterPriceRate = Double.parseDouble(args[2]);
-
-            numberOfClients = Integer.parseInt(args[3]);
-            numberOfScooters = Integer.parseInt(args[4]);
-            numberOfWorkers = Integer.parseInt(args[5]);
         }
+
+        monetaryIncentive = Double.parseDouble(args[argIndex]);
+        staffTravelCost = Double.parseDouble(args[argIndex + 1]);
+        scooterPriceRate = Double.parseDouble(args[argIndex + 2]);
+
+        numberOfClients = Integer.parseInt(args[argIndex + 3]);
+        numberOfScooters = Integer.parseInt(args[argIndex + 4]);
+        numberOfWorkers = Integer.parseInt(args[argIndex + 5]);
 
         Runtime rt = Runtime.instance();
         Profile p1 = new ProfileImpl();
@@ -77,7 +72,8 @@ public class Main {
             for (int i = 0; i < numberOfWorkers; i++) {
                 String name = "worker_" + i;
                 if (poiFlag) {
-                    AgentController worker = mainContainer.acceptNewAgent(name, new WorkerAgent(name, Utility.getPOICoordenates(i)));
+                    AgentController worker = mainContainer.acceptNewAgent(name,
+                            new WorkerAgent(name, Utility.getPOICoordenates(i)));
                     worker.start();
                 } else {
                     AgentController worker = mainContainer.acceptNewAgent(name, new WorkerAgent(name));
