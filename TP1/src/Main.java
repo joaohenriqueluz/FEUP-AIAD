@@ -37,13 +37,25 @@ public class Main {
             }
         }
 
-        monetaryIncentive = Double.parseDouble(args[argIndex]);
-        staffTravelCost = Double.parseDouble(args[argIndex + 1]);
-        scooterPriceRate = Double.parseDouble(args[argIndex + 2]);
+        if ((args.length - argIndex) != 6) {
+            System.err.println(
+                    "Incorrect command. Try: java Main [-p] [-v] <monetary_incentive> <staff_travel_cost> <scooter_price_rate> <number_of_clients> <number_of_scooter> <number_of_workers> ");
+            return;
+        }
 
-        numberOfClients = Integer.parseInt(args[argIndex + 3]);
-        numberOfScooters = Integer.parseInt(args[argIndex + 4]);
-        numberOfWorkers = Integer.parseInt(args[argIndex + 5]);
+        try {
+            monetaryIncentive = Double.parseDouble(args[argIndex]);
+            staffTravelCost = Double.parseDouble(args[argIndex + 1]);
+            scooterPriceRate = Double.parseDouble(args[argIndex + 2]);
+
+            numberOfClients = Integer.parseInt(args[argIndex + 3]);
+            numberOfScooters = Integer.parseInt(args[argIndex + 4]);
+            numberOfWorkers = Integer.parseInt(args[argIndex + 5]);
+        } catch (Exception e) {
+            System.err.println(
+                    "Incorrect command. Try: java Main [-p] [-v] <monetary_incentive> <staff_travel_cost> <scooter_price_rate> <number_of_clients> <number_of_scooter> <number_of_workers> ");
+            return;
+        }
 
         Runtime rt = Runtime.instance();
         Profile p1 = new ProfileImpl();
