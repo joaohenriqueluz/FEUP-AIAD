@@ -6,7 +6,7 @@ import jade.proto.ContractNetInitiator;
 import java.util.ArrayList;
 import java.util.Vector;
 import jade.core.behaviours.DataStore;
-import jade.proto.AchieveREResponder;
+import jade.proto.SSIteratedAchieveREResponder;
 
 public class CompanyWorkerContractInitiator extends ContractNetInitiator {
 
@@ -43,25 +43,43 @@ public class CompanyWorkerContractInitiator extends ContractNetInitiator {
         System.out.println("got " + responses.size() + " responses!");
         for (int i = 0; i < responses.size(); i++) {
             ACLMessage msg = ((ACLMessage) responses.get(i)).createReply();
-            double proposalDistance = Double.parseDouble(((ACLMessage) responses.get(i)).getContent());
-            if (bestProposal == -1) {
-                bestProposal = i;
-                bestDistance = proposalDistance;
-                msg.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
-            } else if (bestDistance > proposalDistance) {
-                ((ACLMessage) acceptances.get(bestProposal)).setPerformative(ACLMessage.REJECT_PROPOSAL);
-                bestProposal = i;
-                bestDistance = proposalDistance;
-                msg.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+            if (((ACLMessage) responses.get(i)).getPerformative() == ACLMessage.PROPOSE) {
+                double proposalDistance = Double.parseDouble(((ACLMessage) responses.get(i)).getContent());
+                if (bestProposal == -1) {
+                    bestProposal = i;
+                    bestDistance = proposalDistance;
+                    msg.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+                } else if (bestDistance > proposalDistance) {
+                    ((ACLMessage) acceptances.get(bestProposal)).setPerformative(ACLMessage.REJECT_PROPOSAL);
+                    bestProposal = i;
+                    bestDistance = proposalDistance;
+                    msg.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+                } else {
+                    msg.setPerformative(ACLMessage.REJECT_PROPOSAL);
+                }
             } else {
                 msg.setPerformative(ACLMessage.REJECT_PROPOSAL);
             }
+            if (acceptances.size() == 0) {
+                ACLMessage response = this.request.createReply();
+                response.setPerformative(ACLMessage.FAILURE);
+                response.setContent("Could not find available workers");
+                if (this.parent != null) {
+                    DataStore ds = getDataStore();
+                    ds.put(((SSIteratedAchieveREResponder) parent).REPLY_KEY, response);
+                } else {
+                    this.company.send(response);
+                }
+            }
             acceptances.add(msg);
         }
-        Position nearestStation = this.company.getNearestStation(scooterPosition);
-        this.company.updateOperationCosts(bestDistance + Utility.getEuclideanDistance(nearestStation, scooterPosition));
-        this.company.printTripsInfo();
-        ((ACLMessage) acceptances.get(bestProposal)).setContent("STATION-AT=>" + nearestStation.toString());
+        if (bestProposal > -1) {
+            Position nearestStation = this.company.getNearestStation(scooterPosition);
+            this.company
+                    .updateOperationCosts(bestDistance + Utility.getEuclideanDistance(nearestStation, scooterPosition));
+            this.company.printTripsInfo();
+            ((ACLMessage) acceptances.get(bestProposal)).setContent("STATION-AT=>" + nearestStation.toString());
+        }
     }
 
     protected void handleAllResultNotifications(Vector resultNotifications) {
@@ -76,7 +94,7 @@ public class CompanyWorkerContractInitiator extends ContractNetInitiator {
             response.setContent("FOUND-WORKER");
             if (this.parent != null) {
                 DataStore ds = getDataStore();
-                ds.put(((AchieveREResponder) parent).RESULT_NOTIFICATION_KEY, response);
+                ds.put(((SSIteratedAchieveREResponder) parent).REPLY_KEY, response);
             } else {
                 this.company.send(response);
             }

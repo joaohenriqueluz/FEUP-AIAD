@@ -31,7 +31,8 @@ class ScooterRequestResponder extends AchieveREResponder {
                 return getDestinationInfo(message, request);
             case "GO-TO":
                 return parseGoTo(message, request);
-
+            case "DROP":
+                return parseDrop(message, request);
             default:
                 break;
         }
@@ -64,6 +65,19 @@ class ScooterRequestResponder extends AchieveREResponder {
             response.setPerformative(ACLMessage.AGREE);
             response.setContent("Processing Request");
             this.scooter.addBehaviour(new RequestPickUpInitiator(this.scooter, new ACLMessage(ACLMessage.REQUEST)));
+        } catch (Exception e) {
+            response.setPerformative(ACLMessage.NOT_UNDERSTOOD);
+            response.setContent("Corrupted Command");
+        }
+        return response;
+    }
+
+    private ACLMessage parseDrop(ArrayList<String> requestContents, ACLMessage request) {
+        ACLMessage response = request.createReply();
+        try {
+            response.setPerformative(ACLMessage.CONFIRM);
+            response.setContent("Dropping scooter...");
+            this.scooter.setBusy(false);
         } catch (Exception e) {
             response.setPerformative(ACLMessage.NOT_UNDERSTOOD);
             response.setContent("Corrupted Command");

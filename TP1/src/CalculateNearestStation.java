@@ -3,7 +3,7 @@ import jade.core.Agent;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import jade.core.behaviours.DataStore;
-import jade.proto.AchieveREResponder;
+import jade.proto.SSIteratedAchieveREResponder;
 
 public class CalculateNearestStation extends Behaviour {
 
@@ -26,7 +26,7 @@ public class CalculateNearestStation extends Behaviour {
         response.setPerformative(ACLMessage.INFORM);
         if (this.parent != null) {
             DataStore ds = getDataStore();
-            ds.put(((AchieveREResponder) parent).RESULT_NOTIFICATION_KEY, response);
+            ds.put(((SSIteratedAchieveREResponder) parent).REPLY_KEY, response);
         } else {
             this.company.send(response);
         }

@@ -13,10 +13,12 @@ public class ClientAgent extends Agent {
     private YellowPagesService yellowPagesService;
     private double scooterPriceRate;
     private double monetaryIncentive;
+    private Boolean busy;
 
     public ClientAgent(String name) {
         clientName = name;
         position = new Position();
+        busy = false;
     }
 
     public String getClientName() {
@@ -33,6 +35,14 @@ public class ClientAgent extends Agent {
 
     public Position getDestination() {
         return this.destination;
+    }
+ 
+    public Boolean isBusy() {
+        return this.busy;
+    }
+
+    public void setBusy(Boolean busy) {
+        this.busy = busy;
     }
 
     public void setPosition(Position newPosition) {
@@ -72,7 +82,7 @@ public class ClientAgent extends Agent {
     public void setup() {
         yellowPagesService = new YellowPagesService(this, "client", clientName);
         yellowPagesService.register();
-        addBehaviour(new ClientTickerBehaviour(this, 5000));
+        addBehaviour(new ClientTickerBehaviour(this, 500));
         // addBehaviour(new RequestOther(this));
         System.out.println(getLocalName() + ": starting to work!");
     }

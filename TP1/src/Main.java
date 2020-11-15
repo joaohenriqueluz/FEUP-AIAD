@@ -67,7 +67,7 @@ public class Main {
             for (int i = 0; i < numberOfScooters; i++) {
                 String name = "electricScooter_" + i;
                 AgentController electricScooter = mainContainer.acceptNewAgent(name,
-                        new ElectricScooterAgent(name, stationPositions.get(i / stationPositions.size())));
+                        new ElectricScooterAgent(name, stationPositions.get(i % stationPositions.size())));
                 electricScooter.start();
             }
 

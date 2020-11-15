@@ -19,21 +19,30 @@ class ClientScooterRequestInitiator extends AchieveREInitiator {
 
     protected void handleRefuse(ACLMessage refuse) {
         Utility.log(this.client, refuse);
+        this.client.setBusy(false);
     }
 
     protected void handleInform(ACLMessage inform) {
         // ...
         Utility.log(this.client, inform);
-        Position stationPosition = Utility.parseMessageWithPosition(inform.getContent());
-        Position decision = this.client.makeDecision(stationPosition);
-        System.out.println("Decision was" + decision.toString());
         ACLMessage reply = inform.createReply();
-        reply.setPerformative(ACLMessage.REQUEST);
-        reply.setContent("GO-TO=>" + decision.toString());
+
+        Position stationPosition = Utility.parseMessageWithPosition(inform.getContent());
+        if (Utility.getEuclideanDistance(stationPosition, this.client.getPosition()) == 0) {
+            reply.setPerformative(ACLMessage.REQUEST);
+            reply.setContent("DROP=>");
+        } else {
+            Position decision = this.client.makeDecision(stationPosition);
+            reply.setPerformative(ACLMessage.REQUEST);
+            reply.setContent("GO-TO=>" + decision.toString());
+
+        }
+        this.client.setBusy(false);
         this.client.send(reply);
     }
 
     protected void handleFailure(ACLMessage failure) {
         Utility.log(this.client, failure);
+        this.client.setBusy(false);
     }
 }

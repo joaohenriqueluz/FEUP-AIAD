@@ -14,6 +14,7 @@ class RequestScooterInitiator extends AchieveREInitiator {
     public RequestScooterInitiator(ClientAgent client, ACLMessage msg) {
         super(client, msg);
         this.client = client;
+        this.client.setBusy(true);
         // Request: GET-SCOOTER [Position]
         String message = "GET-SCOOTER=>" + this.client.getPosition().toString();
         msg.setContent(message);
@@ -35,6 +36,7 @@ class RequestScooterInitiator extends AchieveREInitiator {
 
     protected void handleRefuse(ACLMessage refuse) {
         Utility.log(this.client, refuse);
+        this.client.setBusy(false);
     }
 
     protected void handleInform(ACLMessage inform) {
@@ -52,5 +54,6 @@ class RequestScooterInitiator extends AchieveREInitiator {
 
     protected void handleFailure(ACLMessage failure) {
         Utility.log(this.client, failure);
+        this.client.setBusy(false);
     }
 }

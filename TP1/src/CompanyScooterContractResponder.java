@@ -17,6 +17,11 @@ public class CompanyScooterContractResponder extends ContractNetResponder {
     protected ACLMessage handleCfp(ACLMessage cfp) {
         Utility.log(this.scooter, cfp);
         ACLMessage reply = cfp.createReply();
+        if(this.scooter.isBusy()){
+            System.out.println(this.scooter.getLocalName() + "is busy");
+        }else{
+            System.out.println(this.scooter.getLocalName() + "is NOT busy");
+        }
         if (!this.scooter.isBusy()) {
             ArrayList<String> tokens = Utility.parseMessage(cfp.getContent());
             double distance;

@@ -12,10 +12,10 @@ public class WorkerContractResponder extends ContractNetResponder {
     private Position positionOfScooter;
     private AID scooterAID;
 
-    public WorkerContractResponder(WorkerAgent a, MessageTemplate mt) {
-        super(a, mt);
+    public WorkerContractResponder(WorkerAgent worker, MessageTemplate mt) {
+        super(worker, mt);
         System.out.println("Constructor WorkerContractResponder");
-        this.worker = a;
+        this.worker = worker;
     }
 
     protected ACLMessage handleCfp(ACLMessage cfp) {
@@ -23,16 +23,23 @@ public class WorkerContractResponder extends ContractNetResponder {
         ACLMessage reply = cfp.createReply();
         ArrayList<String> tokens = Utility.parseMessage(cfp.getContent());
         double distance;
-        switch (tokens.get(0)) {
-            case "GET-WORKER":
-                scooterAID = new AID(tokens.get(2));
-                positionOfScooter = Utility.parsePosition(tokens.get(1));
-                distance = Utility.getEuclideanDistance(this.worker.getPosition(),positionOfScooter);
-                reply.setContent("" + distance);
-                reply.setPerformative(ACLMessage.PROPOSE);
-                break;
-            default:
-                break;
+        System.out.println("\n\n\n" + worker.getLocalName()+ "BUSY: "+ this.worker.isBusy()+ "\n\n\n");
+        if (!this.worker.isBusy()) {
+            System.out.println(this.worker.getLocalName() + " is NOT Busy");
+            switch (tokens.get(0)) {
+                case "GET-WORKER":
+                    scooterAID = new AID(tokens.get(2));
+                    positionOfScooter = Utility.parsePosition(tokens.get(1));
+                    distance = Utility.getEuclideanDistance(this.worker.getPosition(), positionOfScooter);
+                    reply.setContent("" + distance);
+                    reply.setPerformative(ACLMessage.PROPOSE);
+                    break;
+                default:
+                    break;
+            }
+        }else{
+            System.out.println(this.worker.getLocalName() + " is Busy");
+            reply.setPerformative(ACLMessage.REFUSE);
         }
         return reply;
     }
@@ -45,6 +52,7 @@ public class WorkerContractResponder extends ContractNetResponder {
         Position stationPosition = Utility.parseMessageWithPosition(accept.getContent());
         System.out.println(this.worker.getLocalName() + " got an accept!");
         this.worker.setPosition(positionOfScooter);
+        this.worker.setBusy(true);
         ACLMessage result = accept.createReply();
         result.setPerformative(ACLMessage.INFORM);
         result.setContent("IM-AT=>" + this.worker.getPosition().toString() + "--" + this.worker.getAID().getName());
@@ -53,6 +61,7 @@ public class WorkerContractResponder extends ContractNetResponder {
         message.setContent("CHARGE-AT=>" + stationPosition.toString());
         message.addReceiver(scooterAID);
         this.worker.send(message);
+        this.worker.setBusy(false);
         // this.worker.addBehaviour(new ScooterRequestResponder(this.worker,
         // MessageTemplate.MatchPerformative(ACLMessage.REQUEST)));
         return result;

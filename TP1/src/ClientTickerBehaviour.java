@@ -12,7 +12,9 @@ public class ClientTickerBehaviour extends TickerBehaviour {
         this.client = client;
     }
 
-    public void onTick(){
-        this.client.addBehaviour(new RequestScooterInitiator(this.client, new ACLMessage(ACLMessage.REQUEST)));
+    public void onTick() {
+        if (!this.client.isBusy()) {
+            this.client.addBehaviour(new RequestScooterInitiator(this.client, new ACLMessage(ACLMessage.REQUEST)));
+        }
     }
 }

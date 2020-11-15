@@ -9,16 +9,19 @@ public class WorkerAgent extends Agent {
     private String workerName;
     private Position position;
     private Position destination;
+    private Boolean busy;
     private YellowPagesService yellowPagesService;
 
     public WorkerAgent(String name) {
         workerName = name;
         position = new Position();
+        busy = false;
     }
 
     public WorkerAgent(String name, Position position) {
         workerName = name;
         this.position = position;
+        busy = false;
     }
 
     public String getWorkerName() {
@@ -36,6 +39,14 @@ public class WorkerAgent extends Agent {
     public void setPosition(Position newPosition) {
         System.out.println(getLocalName() + " new position is " + newPosition.toString());
         this.position = newPosition;
+    }
+
+    public Boolean isBusy() {
+        return this.busy;
+    }
+
+    public void setBusy(Boolean busy) {
+        this.busy = busy;
     }
 
     public YellowPagesService getYellowPagesService() {

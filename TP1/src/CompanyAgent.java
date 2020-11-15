@@ -3,6 +3,8 @@ import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.proto.SSResponderDispatcher; 
+
 
 public class CompanyAgent extends Agent {
 
@@ -31,9 +33,7 @@ public class CompanyAgent extends Agent {
 
         if (stationAtPOIs) {
             chargingStationPositions = Utility.placeStationsAtPOIs(numberOfStations);
-            System.out.println("Placing at pois");
         } else {
-            System.out.println("Placing at random positions");
             for (int i = 0; i < numberOfStations; i++) {
                 chargingStationPositions.add(new Position());
             }
@@ -56,7 +56,7 @@ public class CompanyAgent extends Agent {
         return this.numberOfSuccessfulTrips;
     }
 
-    public void updateNumberOfSuccessfulTrips(int numberOfSuccessfulTrips) {
+    public synchronized void updateNumberOfSuccessfulTrips(int numberOfSuccessfulTrips) {
         this.numberOfSuccessfulTrips += numberOfSuccessfulTrips;
     }
 
@@ -64,7 +64,7 @@ public class CompanyAgent extends Agent {
         return this.numberOfTrips;
     }
 
-    public void updateNumberOfTrips(int numberOfTrips) {
+    public synchronized void updateNumberOfTrips(int numberOfTrips) {
         this.numberOfTrips += numberOfTrips;
     }
 
@@ -84,12 +84,12 @@ public class CompanyAgent extends Agent {
         return this.netIncome;
     }
 
-    public void updateNetIncome(double distance) {
+    public synchronized void updateNetIncome(double distance) {
         this.netIncome += distance * scooterPriceRate;
         updateNumberOfTrips(1);
     }
 
-    public void updateNetIncomeWithoutIncentive(double distance) {
+    public synchronized void updateNetIncomeWithoutIncentive(double distance) {
         this.netIncome += distance * scooterPriceRate - monetaryIncentive;
         updateNumberOfSuccessfulTrips(1);
         updateNumberOfTrips(1);
@@ -99,7 +99,7 @@ public class CompanyAgent extends Agent {
         return this.operationCosts;
     }
 
-    public void updateOperationCosts(double distance) {
+    public synchronized void updateOperationCosts(double distance) {
         System.out.println("Worker traveled " + distance);
         this.operationCosts += distance * staffTravelCost;
     }
@@ -133,15 +133,22 @@ public class CompanyAgent extends Agent {
         System.out.println("Average operation cost per trip: " + averageOperationCostPerTrip);
     }
 
-    public Position getRandomStation(){
+    public Position getRandomStation() {
         int i = (int) Math.floor(Math.random() * (chargingStationPositions.size() - 1));
         return chargingStationPositions.get(i);
     }
-    
+
     public void setup() {
         yellowPagesService = new YellowPagesService(this, "company", companyName);
         yellowPagesService.register();
-        addBehaviour(new CompanyRequestResponder(this, MessageTemplate.MatchPerformative(ACLMessage.REQUEST)));
+        MessageTemplate template = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
+         addBehaviour(new SSResponderDispatcher(this, template) {
+             @Override
+             protected Behaviour createResponder(ACLMessage request) {
+                 return new CompanyRequestResponder(((CompanyAgent) this.getAgent()), request);
+             }
+            });
+        // addBehaviour(new CompanyRequestResponder(this, MessageTemplate.MatchPerformative(ACLMessage.REQUEST)));
         System.out.println(getLocalName() + ": starting to work!");
     }
 

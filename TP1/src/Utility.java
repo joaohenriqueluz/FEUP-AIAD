@@ -15,26 +15,6 @@ public class Utility {
         return Math.sqrt(Math.pow(p1.getX() - p2.getX(), 2) + Math.pow(p1.getY() - p2.getY(), 2));
     }
 
-    public static void sendMessage(Agent senderAgent, AID receiverAgent, int messageType, String conversationID,
-            String content) {
-        ACLMessage message = new ACLMessage(messageType);
-        message.setConversationId(conversationID);
-        message.addReceiver(receiverAgent);
-        message.setContent(content);
-        senderAgent.send(message);
-    }
-
-    public static String arrayToString(String[] array) {
-        String message = new String();
-        for (int i = 0; i < array.length; i++) {
-            message += array[i];
-            if (i < array.length - 1)
-                message += ",";
-        }
-
-        return message;
-    }
-
     public static Position parsePosition(String message) {
         String[] coordenates = message.split(",");
         int x = Integer.parseInt(coordenates[0]);
@@ -52,10 +32,12 @@ public class Utility {
         ArrayList<String> parsed = new ArrayList<String>();
         String[] tokens = message.split("=>");
         parsed.add(tokens[0]);
-        String values = tokens[1];
-        String[] arguments = values.split("--");
-        for (String argument : arguments) {
-            parsed.add(argument);
+        if (tokens.length > 1) {
+            String values = tokens[1];
+            String[] arguments = values.split("--");
+            for (String argument : arguments) {
+                parsed.add(argument);
+            }
         }
         return parsed;
     }
@@ -83,11 +65,9 @@ public class Utility {
         Position position;
         for (int i = 0; i < length; i++) {
             if (i < POIs.size()) {
-                System.out.println("placing at POI: " + POIs.get(i).toString());
                 positions.add(POIs.get(i));
             } else {
                 position = new Position();
-                System.out.println("placing at random position: " + position);
                 positions.add(position);
             }
         }

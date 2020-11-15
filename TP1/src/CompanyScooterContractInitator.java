@@ -2,11 +2,10 @@ import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.proto.ContractNetInitiator;
-
 import java.util.ArrayList;
 import java.util.Vector;
 import jade.core.behaviours.DataStore;
-import jade.proto.AchieveREResponder;
+import jade.proto.SSIteratedAchieveREResponder;
 
 public class CompanyScooterContractInitator extends ContractNetInitiator {
 
@@ -65,7 +64,7 @@ public class CompanyScooterContractInitator extends ContractNetInitiator {
             response.setContent("Could not find available scooters");
             if (this.parent != null) {
                 DataStore ds = getDataStore();
-                ds.put(((AchieveREResponder) parent).RESULT_NOTIFICATION_KEY, response);
+                ds.put(((SSIteratedAchieveREResponder) parent).REPLY_KEY, response);
             } else {
                 this.company.send(response);
             }
@@ -84,7 +83,7 @@ public class CompanyScooterContractInitator extends ContractNetInitiator {
             response.setContent("SCOOTER-AT=>" + nearestScooterPosition.toString() + "--" + parsed.get(2));
             if (this.parent != null) {
                 DataStore ds = getDataStore();
-                ds.put(((AchieveREResponder) parent).RESULT_NOTIFICATION_KEY, response);
+                ds.put(((SSIteratedAchieveREResponder) parent).REPLY_KEY, response);
             } else {
                 this.company.send(response);
             }
