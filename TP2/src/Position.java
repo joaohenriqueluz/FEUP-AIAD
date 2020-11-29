@@ -13,8 +13,8 @@ public class Position {
 
     public Position() {
         Random rand = new Random();
-        this.x = rand.nextInt(1000);
-        this.y = rand.nextInt(1000);
+        this.x = rand.nextInt(RepastLauncher.maxSpaceSize()-1);
+        this.y = rand.nextInt(RepastLauncher.maxSpaceSize()-1);
     }
 
     public int getX() {

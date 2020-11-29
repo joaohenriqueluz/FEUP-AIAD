@@ -24,14 +24,14 @@ public class RepastLauncher extends Repast3Launcher {
     double staffTravelCost = 0;
     double scooterPriceRate = 0;
 
-    int numberOfClients = 0;
-    int numberOfScooters = 0;
-    int numberOfWorkers = 0;
+    int numberOfClients = 1;
+    int numberOfScooters = 1;
+    int numberOfWorkers = 1;
 
     private Object2DGrid space;
     private Schedule schedule;
     private DisplaySurface dsurf;
-    private int spaceSize;
+    public static int spaceSize = 150;
 
     private ArrayList<Agent> agentList;
 
@@ -46,11 +46,14 @@ public class RepastLauncher extends Repast3Launcher {
     }
 
     public RepastLauncher() {
-        spaceSize = 100;
+        super();
         agentList = new ArrayList<Agent>();
     }
 
+    @Override
     public void setup() {
+        super.setup();
+        System.out.println("setup");
         schedule = new Schedule();
         if (dsurf != null)
             dsurf.dispose();
@@ -59,12 +62,17 @@ public class RepastLauncher extends Repast3Launcher {
     }
 
     @Override
-    protected void launchJADE() {
+    public void launchJADE(){
+        System.out.println("launchJADE");
+    }
+
+    protected void launchAgents() {
         System.out.println("Launching JADE");
         Runtime rt = Runtime.instance();
         Profile p1 = new ProfileImpl();
         ContainerController mainContainer = rt.createMainContainer(p1);
         space = new Object2DGrid(spaceSize, spaceSize);
+
         try {
             CompanyAgent companyAgent = new CompanyAgent(10, "company_0", poiFlag, monetaryIncentive, staffTravelCost,
                     scooterPriceRate);
@@ -83,6 +91,7 @@ public class RepastLauncher extends Repast3Launcher {
                 String name = "client_" + i;
                 ClientAgent clientAgent = new ClientAgent(name, space);
                 AgentController client = mainContainer.acceptNewAgent(name, clientAgent);
+                space.putObjectAt(clientAgent.getPosition().getX(), clientAgent.getPosition().getY(), this);
                 agentList.add(clientAgent);
                 client.start();
             }
@@ -104,27 +113,38 @@ public class RepastLauncher extends Repast3Launcher {
             e.printStackTrace();
         }
     }
-
+    @Override
     public void begin() {
         super.begin();
-		buildDisplay();
+        System.out.println("begin");
+        launchAgents();
+        buildDisplay();
+        buildSchedule();
     }
-    
+
     private void buildDisplay() {
-		// space and display surface
+        System.out.println("BuildDisplay");
+        // space and display surface
 		Object2DDisplay display = new Object2DDisplay(space);
 		display.setObjectList(agentList);
 		dsurf.addDisplayableProbeable(display, "Agents Space");
 		dsurf.display();
 	}
 
+	private void buildSchedule() {
+        System.out.println("buildSchedule");
+		// schedule.scheduleActionBeginning(0, new MainAction());
+		schedule.scheduleActionAtInterval(1, dsurf, "updateDisplay", Schedule.LAST);
+	}
 
+    @Override
     public String[] getInitParam() {
-        return new String[] { "poiFlag", "monetaryIncentive", "staffTravelCost", "scooterPriceRate", "numberOfClients",
+        return new String[] { "spaceSize", "poiFlag", "monetaryIncentive", "staffTravelCost", "scooterPriceRate", "numberOfClients",
                 "numberOfScooters", "numberOfWorkers" };
         // return new String[] {};
     }
 
+    @Override
     public String getName() {
         return "Electric Scooter Simulation";
     }
@@ -187,5 +207,17 @@ public class RepastLauncher extends Repast3Launcher {
 
     public void setNumberOfWorkers(int numberOfWorkers) {
         this.numberOfWorkers = numberOfWorkers;
+    }   
+
+    public static int maxSpaceSize() {
+		return spaceSize;
     }
+    
+	public int getSpaceSize() {
+		return spaceSize;
+	}
+
+	public void setSpaceSize(int newSpaceSize) {
+		spaceSize = newSpaceSize;
+	}
 }

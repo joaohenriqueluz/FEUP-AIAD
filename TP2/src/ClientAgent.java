@@ -27,9 +27,8 @@ public class ClientAgent extends Agent implements Drawable {
         this.clientName = name;
         this.position = new Position();
         this.busy = false;
-        this.color = new Color( 127,127 , 255);
+        this.color = new Color( 127,127,255);
         this.space = space;
-        this.space.putObjectAt(position.getX(), position.getY(), this);
     }
 
     public String getClientName() {
