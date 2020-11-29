@@ -3,6 +3,7 @@ import jdk.jshell.execution.Util;
 import java.util.ArrayList;
 
 import sajas.sim.repast3.Repast3Launcher;
+import sajas.core.Agent;
 import sajas.core.Runtime;
 import sajas.wrapper.AgentController;
 import sajas.wrapper.ContainerController;
@@ -10,8 +11,11 @@ import sajas.wrapper.ContainerController;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.StaleProxyException;
-
+import uchicago.src.sim.engine.Schedule;
 import uchicago.src.sim.engine.SimInit;
+import uchicago.src.sim.gui.DisplaySurface;
+import uchicago.src.sim.gui.Object2DDisplay;
+import uchicago.src.sim.space.Object2DGrid;
 
 public class RepastLauncher extends Repast3Launcher {
 
@@ -24,6 +28,13 @@ public class RepastLauncher extends Repast3Launcher {
     int numberOfScooters = 0;
     int numberOfWorkers = 0;
 
+    private Object2DGrid space;
+    private Schedule schedule;
+    private DisplaySurface dsurf;
+    private int spaceSize;
+
+    private ArrayList<Agent> agentList;
+
     public static void main(String[] args) {
         boolean runMode = false; // BATCH_MODE or !BATCH_MODE
         // create a simulation
@@ -34,13 +45,26 @@ public class RepastLauncher extends Repast3Launcher {
         init.loadModel(model, null, runMode);
     }
 
+    public RepastLauncher() {
+        spaceSize = 100;
+        agentList = new ArrayList<Agent>();
+    }
+
+    public void setup() {
+        schedule = new Schedule();
+        if (dsurf != null)
+            dsurf.dispose();
+        dsurf = new DisplaySurface(this, "Color Picking Display");
+        registerDisplaySurface("Color Picking Display", dsurf);
+    }
+
     @Override
     protected void launchJADE() {
-        System.out.println("coaiscjasoicjsoaiosajci");
+        System.out.println("Launching JADE");
         Runtime rt = Runtime.instance();
         Profile p1 = new ProfileImpl();
         ContainerController mainContainer = rt.createMainContainer(p1);
-
+        space = new Object2DGrid(spaceSize, spaceSize);
         try {
             CompanyAgent companyAgent = new CompanyAgent(10, "company_0", poiFlag, monetaryIncentive, staffTravelCost,
                     scooterPriceRate);
@@ -57,7 +81,9 @@ public class RepastLauncher extends Repast3Launcher {
 
             for (int i = 0; i < numberOfClients; i++) {
                 String name = "client_" + i;
-                AgentController client = mainContainer.acceptNewAgent(name, new ClientAgent(name));
+                ClientAgent clientAgent = new ClientAgent(name, space);
+                AgentController client = mainContainer.acceptNewAgent(name, clientAgent);
+                agentList.add(clientAgent);
                 client.start();
             }
 
@@ -78,6 +104,20 @@ public class RepastLauncher extends Repast3Launcher {
             e.printStackTrace();
         }
     }
+
+    public void begin() {
+        super.begin();
+		buildDisplay();
+    }
+    
+    private void buildDisplay() {
+		// space and display surface
+		Object2DDisplay display = new Object2DDisplay(space);
+		display.setObjectList(agentList);
+		dsurf.addDisplayableProbeable(display, "Agents Space");
+		dsurf.display();
+	}
+
 
     public String[] getInitParam() {
         return new String[] { "poiFlag", "monetaryIncentive", "staffTravelCost", "scooterPriceRate", "numberOfClients",

@@ -1,6 +1,13 @@
 import sajas.core.Agent;
+import uchicago.src.sim.space.Object2DGrid;
+import uchicago.src.sim.util.Random;
+import uchicago.src.sim.gui.Drawable;
+import uchicago.src.sim.gui.SimGraphics;
 
-public class ClientAgent extends Agent {
+import java.awt.Color;
+
+
+public class ClientAgent extends Agent implements Drawable {
 
     private String clientName;
     private Position position;
@@ -12,10 +19,17 @@ public class ClientAgent extends Agent {
     private double monetaryIncentive;
     private Boolean busy;
 
-    public ClientAgent(String name) {
+    // Display
+    private Color color;
+    private Object2DGrid space;
+
+    public ClientAgent(String name, Object2DGrid space) {
         this.clientName = name;
         this.position = new Position();
         this.busy = false;
+        this.color = new Color( 127,127 , 255);
+        this.space = space;
+        this.space.putObjectAt(position.getX(), position.getY(), this);
     }
 
     public String getClientName() {
@@ -124,5 +138,17 @@ public class ClientAgent extends Agent {
 
     public void takeDown() {
         System.out.println("** " + getLocalName() + ": done working. **");
+    }
+
+    public void draw(SimGraphics g) {
+        g.drawFastCircle(color);
+    }
+
+    public int getY(){
+        return position.getY();
+    }
+
+    public int getX(){
+        return position.getX();
     }
 }
