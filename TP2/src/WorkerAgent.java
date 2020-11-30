@@ -1,8 +1,13 @@
 import sajas.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import uchicago.src.sim.space.Object2DGrid;
+import uchicago.src.sim.util.Random;
+import uchicago.src.sim.gui.Drawable;
+import uchicago.src.sim.gui.SimGraphics;
 
-public class WorkerAgent extends Agent {
+import java.awt.Color;
+public class WorkerAgent extends Agent implements Drawable{
 
     private String workerName;
     private Position position;
@@ -10,16 +15,24 @@ public class WorkerAgent extends Agent {
     private Boolean busy;
     private YellowPagesService yellowPagesService;
 
-    public WorkerAgent(String name) {
+    // Display
+    private Color color;
+    private Object2DGrid space;
+
+    public WorkerAgent(String name, Object2DGrid space) {
         workerName = name;
         position = new Position();
         busy = false;
+        this.color = new Color( 127,255,127);
+        this.space = space;
     }
 
-    public WorkerAgent(String name, Position position) {
+    public WorkerAgent(String name, Position position, Object2DGrid space) {
         workerName = name;
         this.position = position;
         busy = false;
+        this.color = new Color( 127,255,127);
+        this.space = space;
     }
 
     public String getWorkerName() {
@@ -65,4 +78,18 @@ public class WorkerAgent extends Agent {
     public void takeDown() {
         System.out.println("** " + getLocalName() + ": done working. **");
     }
+
+    public void draw(SimGraphics g) {
+        g.drawFastCircle(color);
+    }
+
+    public int getY(){
+        return position.getY();
+    }
+
+    public int getX(){
+        return position.getX();
+    }
+
+
 }

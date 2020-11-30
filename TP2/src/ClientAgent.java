@@ -92,7 +92,7 @@ public class ClientAgent extends Agent implements Drawable {
     public void setup() {
         yellowPagesService = new YellowPagesService(this, "client", clientName);
         yellowPagesService.register();
-        addBehaviour(new ClientTickerBehaviour(this, 2000));
+        // addBehaviour(new ClientTickerBehaviour(this, 2000));
         System.out.println("** " + getLocalName() + ": starting to work! **");
     }
 

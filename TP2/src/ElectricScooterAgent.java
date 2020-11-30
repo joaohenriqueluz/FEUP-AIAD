@@ -1,8 +1,13 @@
 import sajas.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import uchicago.src.sim.space.Object2DGrid;
+import uchicago.src.sim.util.Random;
+import uchicago.src.sim.gui.Drawable;
+import uchicago.src.sim.gui.SimGraphics;
+import java.awt.Color;
 
-public class ElectricScooterAgent extends Agent {
+public class ElectricScooterAgent extends Agent implements Drawable{
 
     private String scooterName;
     private int range;
@@ -10,12 +15,17 @@ public class ElectricScooterAgent extends Agent {
     private Position tripStartPosition;
     private YellowPagesService yellowPagesService;
     private Boolean busy;
+    // Display
+    private Color color;
+    private Object2DGrid space;
 
-    public ElectricScooterAgent(String name, Position position) {
+    public ElectricScooterAgent(String name, Position position, Object2DGrid space) {
         scooterName = name;
         this.position = position;
         this.tripStartPosition = position;
         busy = false;
+        this.color = new Color( 255,127,127);
+        this.space = space;
     }
 
     public String getScooterName() {
@@ -75,6 +85,18 @@ public class ElectricScooterAgent extends Agent {
         // addBehaviour(new ElecticScooterREResponder(this,
         // MessageTemplate.MatchPerformative(ACLMessage.REQUEST)));
         addBehaviour(new CompanyScooterContractResponder(this, MessageTemplate.MatchPerformative(ACLMessage.CFP)));
+    }
+
+    public void draw(SimGraphics g) {
+        g.drawFastCircle(color);
+    }
+
+    public int getY(){
+        return position.getY();
+    }
+
+    public int getX(){
+        return position.getX();
     }
 
 }

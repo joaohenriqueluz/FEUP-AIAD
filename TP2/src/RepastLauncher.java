@@ -11,11 +11,14 @@ import sajas.wrapper.ContainerController;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.StaleProxyException;
+import jade.lang.acl.ACLMessage;
+import uchicago.src.sim.engine.BasicAction;
 import uchicago.src.sim.engine.Schedule;
 import uchicago.src.sim.engine.SimInit;
 import uchicago.src.sim.gui.DisplaySurface;
 import uchicago.src.sim.gui.Object2DDisplay;
 import uchicago.src.sim.space.Object2DGrid;
+import uchicago.src.sim.util.SimUtilities;
 
 public class RepastLauncher extends Repast3Launcher {
 
@@ -62,7 +65,7 @@ public class RepastLauncher extends Repast3Launcher {
     }
 
     @Override
-    public void launchJADE(){
+    public void launchJADE() {
         System.out.println("launchJADE");
     }
 
@@ -82,8 +85,12 @@ public class RepastLauncher extends Repast3Launcher {
             ArrayList<Position> stationPositions = companyAgent.getChargingStationPositions();
             for (int i = 0; i < numberOfScooters; i++) {
                 String name = "electricScooter_" + i;
-                AgentController electricScooter = mainContainer.acceptNewAgent(name,
-                        new ElectricScooterAgent(name, stationPositions.get(i % stationPositions.size())));
+                ElectricScooterAgent electricScooterAgent = new ElectricScooterAgent(name,
+                        stationPositions.get(i % stationPositions.size()), space);
+                AgentController electricScooter = mainContainer.acceptNewAgent(name, electricScooterAgent);
+                space.putObjectAt(electricScooterAgent.getPosition().getX(), electricScooterAgent.getPosition().getY(),
+                        this);
+                agentList.add(electricScooterAgent);
                 electricScooter.start();
             }
 
@@ -98,21 +105,24 @@ public class RepastLauncher extends Repast3Launcher {
 
             for (int i = 0; i < numberOfWorkers; i++) {
                 String name = "worker_" + i;
+                AgentController worker;
+                WorkerAgent workerAgent;
                 if (poiFlag) {
-                    AgentController worker = mainContainer.acceptNewAgent(name,
-                            new WorkerAgent(name, Utility.getPOICoordenates(i)));
-                    worker.start();
+                    workerAgent = new WorkerAgent(name, Utility.getPOICoordenates(i), space);
                 } else {
-                    AgentController worker = mainContainer.acceptNewAgent(name, new WorkerAgent(name));
-                    worker.start();
+                    workerAgent = new WorkerAgent(name, space);
                 }
-
+                worker = mainContainer.acceptNewAgent(name, workerAgent);
+                space.putObjectAt(workerAgent.getPosition().getX(), workerAgent.getPosition().getY(), this);
+                agentList.add(workerAgent);
+                worker.start();
             }
 
         } catch (StaleProxyException e) {
             e.printStackTrace();
         }
     }
+
     @Override
     public void begin() {
         super.begin();
@@ -125,22 +135,40 @@ public class RepastLauncher extends Repast3Launcher {
     private void buildDisplay() {
         System.out.println("BuildDisplay");
         // space and display surface
-		Object2DDisplay display = new Object2DDisplay(space);
-		display.setObjectList(agentList);
-		dsurf.addDisplayableProbeable(display, "Agents Space");
-		dsurf.display();
-	}
+        Object2DDisplay display = new Object2DDisplay(space);
+        display.setObjectList(agentList);
+        dsurf.addDisplayableProbeable(display, "Agents Space");
+        dsurf.display();
+    }
 
 	private void buildSchedule() {
-        System.out.println("buildSchedule");
-		// schedule.scheduleActionBeginning(0, new MainAction());
+        System.out.println("Aaaaann schedule!");
+
+		schedule.scheduleActionBeginning(0, new MainAction());
 		schedule.scheduleActionAtInterval(1, dsurf, "updateDisplay", Schedule.LAST);
-	}
+    }
+
+    class MainAction extends BasicAction {
+        public void execute() {
+            System.out.println("Aaaaann ACTIoN!");
+            // shuffle agents
+            SimUtilities.shuffle(agentList);
+
+            // iterate through all agents
+            for (int i = 0; i < agentList.size(); i++) {
+                ClientAgent client = (ClientAgent) agentList.get(i);
+                if (!client.isBusy()) {
+                    client.addBehaviour(new RequestScooterInitiator(client, new ACLMessage(ACLMessage.REQUEST)));
+                }
+            }
+        }
+
+    }
 
     @Override
     public String[] getInitParam() {
-        return new String[] { "spaceSize", "poiFlag", "monetaryIncentive", "staffTravelCost", "scooterPriceRate", "numberOfClients",
-                "numberOfScooters", "numberOfWorkers" };
+        return new String[] { "spaceSize", "poiFlag", "monetaryIncentive", "staffTravelCost", "scooterPriceRate",
+                "numberOfClients", "numberOfScooters", "numberOfWorkers" };
         // return new String[] {};
     }
 
@@ -207,17 +235,17 @@ public class RepastLauncher extends Repast3Launcher {
 
     public void setNumberOfWorkers(int numberOfWorkers) {
         this.numberOfWorkers = numberOfWorkers;
-    }   
+    }
 
     public static int maxSpaceSize() {
-		return spaceSize;
+        return spaceSize;
     }
-    
-	public int getSpaceSize() {
-		return spaceSize;
-	}
 
-	public void setSpaceSize(int newSpaceSize) {
-		spaceSize = newSpaceSize;
-	}
+    public int getSpaceSize() {
+        return spaceSize;
+    }
+
+    public void setSpaceSize(int newSpaceSize) {
+        spaceSize = newSpaceSize;
+    }
 }
