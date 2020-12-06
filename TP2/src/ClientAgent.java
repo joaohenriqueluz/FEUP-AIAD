@@ -1,11 +1,19 @@
 import sajas.core.Agent;
-import uchicago.src.sim.space.Object2DGrid;
+import uchicago.src.sim.space.BagCell;
+import uchicago.src.sim.space.Cell;
+import uchicago.src.sim.space.Multi2DGrid;
 import uchicago.src.sim.util.Random;
 import uchicago.src.sim.gui.Drawable;
 import uchicago.src.sim.gui.SimGraphics;
 
 import java.awt.Color;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.awt.Toolkit;
 
+import javax.imageio.ImageIO;
 
 public class ClientAgent extends Agent implements Drawable {
 
@@ -21,13 +29,13 @@ public class ClientAgent extends Agent implements Drawable {
 
     // Display
     private Color color;
-    private Object2DGrid space;
+    private Multi2DGrid space;
 
-    public ClientAgent(String name, Object2DGrid space) {
+    public ClientAgent(String name, Multi2DGrid space) {
         this.clientName = name;
         this.position = new Position();
         this.busy = false;
-        this.color = new Color( 127,127,255);
+        this.color = new Color(127, 127, 255);
         this.space = space;
     }
 
@@ -45,7 +53,20 @@ public class ClientAgent extends Agent implements Drawable {
 
     public void setPosition(Position newPosition) {
         System.out.println("** " + getLocalName() + " new position is " + newPosition.toString() + " **");
+        BagCell cell = (BagCell) space.getCellAt(this.position.getX(), this.position.getY());
+        cell.remove(this);
+        space.putObjectAt(this.position.getX(), this.position.getY(), cell);
         this.position = newPosition;
+        cell = (BagCell) space.getCellAt(this.position.getX(), this.position.getY());
+        if (cell == null) {
+            cell = new BagCell();
+            cell.add(this);
+            space.putObjectAt(this.position.getX(), this.position.getY(), cell); // not multi-space (only 1 agent per
+                                                                                 // cell)
+        } else {
+            cell.add(this);
+        }
+        System.out.println("\n\n" + cell.size() + "\n\n\n");
     }
 
     public Position getDestination() {
@@ -92,7 +113,7 @@ public class ClientAgent extends Agent implements Drawable {
     public void setup() {
         yellowPagesService = new YellowPagesService(this, "client", clientName);
         yellowPagesService.register();
-        // addBehaviour(new ClientTickerBehaviour(this, 2000));
+        addBehaviour(new ClientTickerBehaviour(this, 2000));
         System.out.println("** " + getLocalName() + ": starting to work! **");
     }
 
@@ -140,14 +161,16 @@ public class ClientAgent extends Agent implements Drawable {
     }
 
     public void draw(SimGraphics g) {
-        g.drawFastCircle(color);
+        // Image img = Toolkit.getDefaultToolkit().getImage("/assets/scooter.png");
+        // g.drawImageToFit(img);
+        g.drawFastRect(color);
     }
 
-    public int getY(){
+    public int getY() {
         return position.getY();
     }
 
-    public int getX(){
+    public int getX() {
         return position.getX();
     }
 }

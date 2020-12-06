@@ -3,6 +3,8 @@ import sajas.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import sajas.proto.SSResponderDispatcher;
+import uchicago.src.sim.space.BagCell;
+import uchicago.src.sim.space.Multi2DGrid;
 
 import java.util.ArrayList;
 
@@ -18,9 +20,10 @@ public class CompanyAgent extends Agent {
     private double monetaryIncentive;
     private double netIncome;
     private double operationCosts;
+    Multi2DGrid space;
 
     public CompanyAgent(int numberOfStations, String name, Boolean stationAtPOIs, Double monetaryIncentive,
-            Double staffTravelCost, Double scooterPriceRate) {
+            Double staffTravelCost, Double scooterPriceRate, Multi2DGrid space) {
         this.companyName = name;
         this.numberOfSuccessfulTrips = 0;
         this.numberOfTrips = 0;
@@ -29,6 +32,7 @@ public class CompanyAgent extends Agent {
         this.monetaryIncentive = monetaryIncentive;
         this.scooterPriceRate = scooterPriceRate;
         this.staffTravelCost = staffTravelCost;
+        this.space = space;
         chargingStationPositions = new ArrayList<Position>();
 
         if (stationAtPOIs) {
@@ -36,6 +40,16 @@ public class CompanyAgent extends Agent {
         } else {
             for (int i = 0; i < numberOfStations; i++) {
                 chargingStationPositions.add(new Position());
+            }
+        }
+        for (Position station : chargingStationPositions) {
+            BagCell cell = (BagCell) space.getCellAt(station.getX(), station.getY());
+            if(cell == null){
+                cell = new BagCell();
+                cell.add(station);
+                space.putObjectAt(station.getX(), station.getY(),cell); // not multi-space (only 1 agent per cell)
+            }else{
+                cell.add(this);
             }
         }
     }

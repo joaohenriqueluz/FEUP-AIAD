@@ -1,7 +1,9 @@
 import java.util.Objects;
 import java.util.Random;
-
-public class Position {
+import java.awt.Color;
+import uchicago.src.sim.gui.Drawable;
+import uchicago.src.sim.gui.SimGraphics;
+public class Position implements Drawable {
 
     private int x;
     private int y;
@@ -13,8 +15,8 @@ public class Position {
 
     public Position() {
         Random rand = new Random();
-        this.x = rand.nextInt(RepastLauncher.maxSpaceSize()-1);
-        this.y = rand.nextInt(RepastLauncher.maxSpaceSize()-1);
+        this.x = rand.nextInt(RepastLauncher.maxSpaceSize() - 1);
+        this.y = rand.nextInt(RepastLauncher.maxSpaceSize() - 1);
     }
 
     public int getX() {
@@ -52,6 +54,11 @@ public class Position {
     @Override
     public int hashCode() {
         return Objects.hash(x, y);
+    }
+
+    @Override
+    public void draw(SimGraphics g) {
+        g.drawFastCircle(new Color(255,255,0));
     }
 
 }

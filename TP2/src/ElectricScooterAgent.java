@@ -1,13 +1,14 @@
 import sajas.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import uchicago.src.sim.space.Object2DGrid;
+import uchicago.src.sim.space.BagCell;
+import uchicago.src.sim.space.Multi2DGrid;
 import uchicago.src.sim.util.Random;
 import uchicago.src.sim.gui.Drawable;
 import uchicago.src.sim.gui.SimGraphics;
 import java.awt.Color;
 
-public class ElectricScooterAgent extends Agent implements Drawable{
+public class ElectricScooterAgent extends Agent implements Drawable {
 
     private String scooterName;
     private int range;
@@ -17,14 +18,14 @@ public class ElectricScooterAgent extends Agent implements Drawable{
     private Boolean busy;
     // Display
     private Color color;
-    private Object2DGrid space;
+    private Multi2DGrid space;
 
-    public ElectricScooterAgent(String name, Position position, Object2DGrid space) {
+    public ElectricScooterAgent(String name, Position position, Multi2DGrid space) {
         scooterName = name;
         this.position = position;
         this.tripStartPosition = position;
         busy = false;
-        this.color = new Color( 255,127,127);
+        this.color = new Color(255, 127, 127);
         this.space = space;
     }
 
@@ -56,9 +57,22 @@ public class ElectricScooterAgent extends Agent implements Drawable{
         return this.position;
     }
 
-    public void setPosition(Position position) {
+    public void setPosition(Position newPosition) {
         System.out.println("** " + getLocalName() + " new position is " + position.toString() + " **");
-        this.position = position;
+        BagCell cell = (BagCell) space.getCellAt(this.position.getX(), this.position.getY());
+        cell.remove(this);
+        space.putObjectAt(this.position.getX(), this.position.getY(), cell);
+        this.position = newPosition;
+        cell = (BagCell) space.getCellAt(this.position.getX(), this.position.getY());
+        if (cell == null) {
+            cell = new BagCell();
+            cell.add(this);
+            space.putObjectAt(this.position.getX(), this.position.getY(), cell); // not multi-space (only 1 agent per
+                                                                                 // cell)
+        } else {
+            cell.add(this);
+        }
+        System.out.println("\n\n" + cell.size() + "\n\n\n");
     }
 
     public Position getTripStartPosition() {
@@ -88,14 +102,14 @@ public class ElectricScooterAgent extends Agent implements Drawable{
     }
 
     public void draw(SimGraphics g) {
-        g.drawFastCircle(color);
+        g.drawFastOval(color);
     }
 
-    public int getY(){
+    public int getY() {
         return position.getY();
     }
 
-    public int getX(){
+    public int getX() {
         return position.getX();
     }
 
