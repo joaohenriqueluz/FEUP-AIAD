@@ -64,7 +64,7 @@ public class WorkerAgent extends Agent implements Drawable {
         } else {
             cell.add(this);
         }
-        System.out.println("\n\n" + cell.size() + "\n\n\n");
+         
     }
 
     public Boolean isBusy() {

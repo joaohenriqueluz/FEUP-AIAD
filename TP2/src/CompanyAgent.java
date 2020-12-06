@@ -44,11 +44,11 @@ public class CompanyAgent extends Agent {
         }
         for (Position station : chargingStationPositions) {
             BagCell cell = (BagCell) space.getCellAt(station.getX(), station.getY());
-            if(cell == null){
+            if (cell == null) {
                 cell = new BagCell();
                 cell.add(station);
-                space.putObjectAt(station.getX(), station.getY(),cell); // not multi-space (only 1 agent per cell)
-            }else{
+                space.putObjectAt(station.getX(), station.getY(), cell); // not multi-space (only 1 agent per cell)
+            } else {
                 cell.add(this);
             }
         }
@@ -128,6 +128,34 @@ public class CompanyAgent extends Agent {
             }
         }
         return nearest;
+    }
+
+    public double getAverageIncomePerTrip() {
+        if (numberOfTrips == 0) {
+            return 0;
+        } else {
+            return ((double) netIncome) / numberOfTrips;
+        }
+    }
+
+    public double getAverageOperationCostPerTrip() {
+        if (numberOfTrips == 0) {
+            return 0;
+        } else {
+            return ((double) operationCosts) / numberOfTrips;
+        }
+    }
+
+    public double getAverageProfitPerTrip() {
+        if (numberOfTrips == 0) {
+            return 0;
+        } else {
+            return (((double) netIncome) - operationCosts) / numberOfTrips;
+        }
+    }
+
+    public double getProfit() {
+        return netIncome - operationCosts;
     }
 
     public void printTripsInfo() {

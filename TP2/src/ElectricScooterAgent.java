@@ -72,7 +72,7 @@ public class ElectricScooterAgent extends Agent implements Drawable {
         } else {
             cell.add(this);
         }
-        System.out.println("\n\n" + cell.size() + "\n\n\n");
+         
     }
 
     public Position getTripStartPosition() {

@@ -12,6 +12,8 @@ import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.StaleProxyException;
 import jade.lang.acl.ACLMessage;
+import uchicago.src.sim.analysis.DataRecorder;
+import uchicago.src.sim.analysis.DataSource;
 import uchicago.src.sim.analysis.OpenSequenceGraph;
 import uchicago.src.sim.analysis.Sequence;
 import uchicago.src.sim.engine.BasicAction;
@@ -40,6 +42,7 @@ public class RepastLauncher extends Repast3Launcher {
     private Schedule schedule;
     private DisplaySurface dsurf;
     public static int spaceSize = 150;
+    private DataRecorder recorder;
 
     private ArrayList<Agent> agentList;
     private CompanyAgent companyAgent;
@@ -139,9 +142,41 @@ public class RepastLauncher extends Repast3Launcher {
     public void begin() {
         super.begin();
         System.out.println("begin");
-        launchAgents();
+        buildModel();
         buildDisplay();
         buildSchedule();
+    }
+
+    public void buildModel() {
+        launchAgents();
+        recorder = new DataRecorder("./src/output/scooterPerformance.csv", this);
+        recorder.addObjectDataSource("Successful Trips Percentage", new DataSource() {
+            public Object execute() {
+                return 100 * ((double) companyAgent.getNumberOfSuccessfulTrips()) / companyAgent.getNumberOfTrips();
+            }
+        });
+
+        recorder.addObjectDataSource("Average Income", new DataSource() {
+            public Object execute() {
+                return companyAgent.getAverageIncomePerTrip();
+            }
+        });
+        recorder.addObjectDataSource("Average Operation Cost", new DataSource() {
+            public Object execute() {
+                return companyAgent.getAverageOperationCostPerTrip();
+            }
+        });
+
+        recorder.addObjectDataSource("Average Proft", new DataSource() {
+            public Object execute() {
+                return companyAgent.getAverageProfitPerTrip();
+            }
+        });
+        recorder.addObjectDataSource("Total Profit", new DataSource() {
+            public Object execute() {
+                return companyAgent.getProfit();
+            }
+        });
     }
 
     private OpenSequenceGraph plotIncome;
@@ -158,11 +193,11 @@ public class RepastLauncher extends Repast3Launcher {
         // graph
         if (plotSuccessuful != null)
             plotSuccessuful.dispose();
-        plotSuccessuful = new OpenSequenceGraph("Scooter service performance", this);
+        plotSuccessuful = new OpenSequenceGraph("Successful Trips", this);
         plotSuccessuful.setAxisTitles("time", "% successful trips");
         plotSuccessuful.setYRange(0, 100);
 
-        plotSuccessuful.addSequence("Consumers", new Sequence() {
+        plotSuccessuful.addSequence("Successful trips", new Sequence() {
             public double getSValue() {
                 return 100 * ((double) companyAgent.getNumberOfSuccessfulTrips()) / companyAgent.getNumberOfTrips();
             }
@@ -171,24 +206,23 @@ public class RepastLauncher extends Repast3Launcher {
 
         if (plotIncome != null)
             plotIncome.dispose();
-        plotIncome = new OpenSequenceGraph("Scooter service performance", this);
+        plotIncome = new OpenSequenceGraph("Income Statement", this);
         plotIncome.setAxisTitles("time", "Monetary Units");
         plotIncome.addSequence("Average Income", new Sequence() {
             public double getSValue() {
-                return ((double) companyAgent.getNetIncome()) / companyAgent.getNumberOfTrips();
+                return companyAgent.getAverageIncomePerTrip();
             }
         });
 
         plotIncome.addSequence("Average Trip Operation Cost", new Sequence() {
             public double getSValue() {
-                return ((double) companyAgent.getOperationCosts()) / companyAgent.getNumberOfTrips();
+                return companyAgent.getAverageOperationCostPerTrip();
             }
         });
 
         plotIncome.addSequence("Average Profit", new Sequence() {
             public double getSValue() {
-                return (((double) companyAgent.getNetIncome()) - companyAgent.getOperationCosts())
-                        / companyAgent.getNumberOfTrips();
+                return companyAgent.getAverageProfitPerTrip();
             }
         });
 
@@ -199,9 +233,15 @@ public class RepastLauncher extends Repast3Launcher {
         System.out.println("Aaaaann schedule!");
 
         // schedule.scheduleActionBeginning(0, new MainAction());
+        getSchedule().scheduleActionAtInterval(500, this, "step");
         getSchedule().scheduleActionAtInterval(1, dsurf, "updateDisplay", Schedule.LAST);
         getSchedule().scheduleActionAtInterval(100, plotSuccessuful, "step", Schedule.LAST);
         getSchedule().scheduleActionAtInterval(100, plotIncome, "step", Schedule.LAST);
+        getSchedule().scheduleActionAtPause(recorder, "writeToFile");
+    }
+
+    public void step() {
+        recorder.record();
     }
 
     @Override

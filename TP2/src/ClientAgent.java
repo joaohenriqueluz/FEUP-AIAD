@@ -66,7 +66,7 @@ public class ClientAgent extends Agent implements Drawable {
         } else {
             cell.add(this);
         }
-        System.out.println("\n\n" + cell.size() + "\n\n\n");
+         
     }
 
     public Position getDestination() {
