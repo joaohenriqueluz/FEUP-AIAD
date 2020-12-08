@@ -9,21 +9,7 @@ import java.util.TimerTask;
 class ScooterRequestResponder extends AchieveREResponder {
 
     ElectricScooterAgent scooter;
-    long delay = 10000L;
-    private Timer timer = new Timer("Timer");
-
-    private class RepeatBehaviour extends TimerTask {
-        @Override
-        public void run() {
-            System.out.println(scooter.getLocalName() + " is busy: "+ scooter.isBusy());
-            if (scooter.isBusy()) {
-                scooter.addBehaviour(new RequestPickUpInitiator(scooter, new ACLMessage(ACLMessage.REQUEST)));
-            } else{
-                timer.cancel();
-            }
-        }
-    }
-
+    
     public ScooterRequestResponder(ElectricScooterAgent scooter, MessageTemplate mt) {
         super(scooter, mt);
         this.scooter = scooter;
@@ -78,7 +64,6 @@ class ScooterRequestResponder extends AchieveREResponder {
             response.setContent("Processing Request");
             this.scooter.addBehaviour(new RequestPickUpInitiator(this.scooter, new ACLMessage(ACLMessage.REQUEST)));
             // timer.schedule(task, delay);
-            timer.scheduleAtFixedRate(new RepeatBehaviour(), 0, 10000);
         } catch (Exception e) {
             response.setPerformative(ACLMessage.NOT_UNDERSTOOD);
             response.setContent("Corrupted Command");
@@ -98,19 +83,4 @@ class ScooterRequestResponder extends AchieveREResponder {
         }
         return response;
     }
-
-    private TimerTask createTimerTask() {
-        return new TimerTask() {
-            @Override
-            public void run() {
-                // System.out.println("Task performed on: " + new Date() + "n" +
-                // "Thread's name: " + Thread.currentThread().getName());
-                if (scooter.isBusy()) {
-                    scooter.addBehaviour(new RequestPickUpInitiator(scooter, new ACLMessage(ACLMessage.REQUEST)));
-                    timer.scheduleAtFixedRate(createTimerTask(), 0, 10000);
-                }
-            }
-        };
-    }
-
 }

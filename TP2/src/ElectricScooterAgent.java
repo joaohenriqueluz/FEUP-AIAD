@@ -45,11 +45,11 @@ public class ElectricScooterAgent extends Agent implements Drawable {
         this.range = range;
     }
 
-    public Boolean isBusy() {
+    public synchronized Boolean isBusy() {
         return this.busy;
     }
 
-    public void setBusy(Boolean busy) {
+    public synchronized void setBusy(Boolean busy) {
         this.busy = busy;
     }
 

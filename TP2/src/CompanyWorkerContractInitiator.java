@@ -27,6 +27,17 @@ public class CompanyWorkerContractInitiator extends ContractNetInitiator {
         Vector v = new Vector();
         cfp.setPerformative(ACLMessage.CFP);
         AID[] workerAgents = company.getYellowPagesService().getAgentList("worker");
+        if (workerAgents.length == 0) {
+            ACLMessage response = this.request.createReply();
+            response.setPerformative(ACLMessage.FAILURE);
+            response.setContent("Could not find available workers");
+            if (this.parent != null) {
+                DataStore ds = getDataStore();
+                ds.put(((SSIteratedAchieveREResponder) parent).REPLY_KEY, response);
+            } else {
+                this.company.send(response);
+            }
+        }
         if (workerAgents != null) {
             for (AID workerId : workerAgents) {
                 cfp.addReceiver(workerId);

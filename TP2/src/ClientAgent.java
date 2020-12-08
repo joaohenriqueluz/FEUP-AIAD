@@ -142,10 +142,10 @@ public class ClientAgent extends Agent implements Drawable {
             }
         }
 
-        // double fitness = Math.random() * (RepastLauncher.getClientsFitnessMax() - RepastLauncher.getClientsFitnessMin()) + RepastLauncher.getClientsFitnessMin();
-        double fitness = Math.random() * (1 - 0.4) + 0.4;
-        // double weather = Math.random() * (RepastLauncher.getWeatherConditionsMax() - RepastLauncher.getWeatherConditionsMin()) + RepastLauncher.getWeatherConditionsMin();
-        double weather = Math.random();
+        double fitness = Math.random() * (RepastLauncher.getClientsFitnessMax() - RepastLauncher.getClientsFitnessMin()) + RepastLauncher.getClientsFitnessMin();
+        // double fitness = Math.random() * (1 - 0.4) + 0.4;
+        double weather = Math.random() * (RepastLauncher.getWeatherConditionsMax() - RepastLauncher.getWeatherConditionsMin()) + RepastLauncher.getWeatherConditionsMin();
+        // double weather = Math.random();
         double distanceWeight = Math.random() * (0.8 - 0.50) + 0.50;
         double moneyWeight = Math.random() * (0.8 - distanceWeight) + 0.1;
         if (monetaryIncentive == 0)

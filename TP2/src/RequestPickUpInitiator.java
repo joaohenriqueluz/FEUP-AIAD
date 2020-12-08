@@ -3,6 +3,8 @@ import jade.lang.acl.ACLMessage;
 import sajas.proto.AchieveREInitiator;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 class RequestPickUpInitiator extends AchieveREInitiator {
     ElectricScooterAgent scooter;
@@ -31,7 +33,6 @@ class RequestPickUpInitiator extends AchieveREInitiator {
     }
 
     protected void handleInform(ACLMessage inform) {
-        // ...
         Utility.log(this.scooter, inform);
         ACLMessage msg = this.scooter.receive();
         if (msg != null && msg.getContent() != null) {
@@ -49,5 +50,6 @@ class RequestPickUpInitiator extends AchieveREInitiator {
 
     protected void handleFailure(ACLMessage failure) {
         Utility.log(this.scooter, failure);
+        scooter.setBusy(false);
     }
 }

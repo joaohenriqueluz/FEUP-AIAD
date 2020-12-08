@@ -32,9 +32,9 @@ public class RepastLauncher extends Repast3Launcher {
     double monetaryIncentive = 0;
     double staffTravelCost = 0;
     double scooterPriceRate = 0;
-    int numberOfClients = 100;
-    int numberOfScooters = 100;
-    int numberOfWorkers = 100;
+    int numberOfClients = 1;
+    int numberOfScooters = 1;
+    int numberOfWorkers = 1;
     static double weatherConditionsMax = 1.0;
     static double weatherConditionsMin = 0.0;
     static double clientsFitnessMax = 1.0; // The clients' physical aptitude
@@ -50,7 +50,7 @@ public class RepastLauncher extends Repast3Launcher {
     private CompanyAgent companyAgent;
 
     public static void main(String[] args) {
-        boolean runMode = true; // BATCH_MODE or !BATCH_MODE
+        boolean runMode = false; // BATCH_MODE or !BATCH_MODE
         // create a simulation
         SimInit init = new SimInit();
         // create a model
