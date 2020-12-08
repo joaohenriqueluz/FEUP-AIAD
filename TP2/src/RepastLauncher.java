@@ -23,7 +23,6 @@ import uchicago.src.sim.gui.DisplaySurface;
 import uchicago.src.sim.gui.Object2DDisplay;
 import uchicago.src.sim.space.BagCell;
 import uchicago.src.sim.space.Multi2DGrid;
-import uchicago.src.sim.space.Multi2DGrid;
 import uchicago.src.sim.util.SimUtilities;
 
 public class RepastLauncher extends Repast3Launcher {
@@ -33,10 +32,13 @@ public class RepastLauncher extends Repast3Launcher {
     double monetaryIncentive = 0;
     double staffTravelCost = 0;
     double scooterPriceRate = 0;
-
-    int numberOfClients = 1;
-    int numberOfScooters = 1;
-    int numberOfWorkers = 1;
+    int numberOfClients = 100;
+    int numberOfScooters = 100;
+    int numberOfWorkers = 100;
+    static double weatherConditionsMax = 1.0;
+    static double weatherConditionsMin = 0.0;
+    static double clientsFitnessMax = 1.0; // The clients' physical aptitude
+    static double clientsFitnessMin = 0.0; // The clients' physical aptitude
 
     public static Multi2DGrid space;
     private Schedule schedule;
@@ -48,7 +50,7 @@ public class RepastLauncher extends Repast3Launcher {
     private CompanyAgent companyAgent;
 
     public static void main(String[] args) {
-        boolean runMode = false; // BATCH_MODE or !BATCH_MODE
+        boolean runMode = true; // BATCH_MODE or !BATCH_MODE
         // create a simulation
         SimInit init = new SimInit();
         // create a model
@@ -247,13 +249,46 @@ public class RepastLauncher extends Repast3Launcher {
     @Override
     public String[] getInitParam() {
         return new String[] { "spaceSize", "poiFlag", "verboseFlag", "monetaryIncentive", "staffTravelCost",
-                "scooterPriceRate", "numberOfClients", "numberOfScooters", "numberOfWorkers" };
+                "scooterPriceRate", "numberOfClients", "numberOfScooters", "numberOfWorkers", "weatherConditionsMax",
+                "weatherConditionsMin", "clientsFitnessMax", "clientsFitnessMin" };
         // return new String[] {};
     }
 
     @Override
     public String getName() {
         return "Electric Scooter Simulation";
+    }
+
+    public static double getClientsFitnessMax() {
+        return clientsFitnessMax;
+    }
+
+    public static void setClientsFitnessMax(double newClientsFitnessMax) {
+        clientsFitnessMax = newClientsFitnessMax;
+    }
+
+    public static double getClientsFitnessMin() {
+        return clientsFitnessMin;
+    }
+
+    public static void setClientsFitnessMin(double newClientsFitnessMin) {
+        clientsFitnessMin = newClientsFitnessMin;
+    }
+
+    public static double getWeatherConditionsMax() {
+        return weatherConditionsMax;
+    }
+
+    public static void setWeatherConditionsMax(double newWeatherConditionsMax) {
+        weatherConditionsMax = newWeatherConditionsMax;
+    }
+
+    public static double getWeatherConditionsMin() {
+        return weatherConditionsMin;
+    }
+
+    public static void setWeatherConditionsMin(double newWeatherConditionsMin) {
+        weatherConditionsMin = newWeatherConditionsMin;
     }
 
     public Boolean isPoiFlag() {
