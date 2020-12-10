@@ -34,7 +34,6 @@ class RequestPickUpInitiator extends AchieveREInitiator {
 
     protected void handleInform(ACLMessage inform) {
         Utility.log(this.scooter, inform);
-        System.out.println("\tREQUEST PICKUP INFORM: "+ inform.getContent());
     }
 
     protected void handleFailure(ACLMessage failure) {

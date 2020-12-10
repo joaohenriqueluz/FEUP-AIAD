@@ -87,11 +87,9 @@ class ScooterRequestResponder extends AchieveREResponder {
     }
 
     private ACLMessage parseChargeAt(ArrayList<String> requestContents, ACLMessage request) {
-        System.out.println("\tFROM WORKER: " + request.getContent());
         ACLMessage reply = request.createReply();
         reply.setPerformative(ACLMessage.INFORM);
         reply.setContent("Got your message!");
-        ArrayList<String> tokens = Utility.parseMessage(request.getContent());
         Position newPosition = Utility.parseMessageWithPosition(request.getContent());
         this.scooter.setPosition(newPosition);
         this.scooter.setTripStartPosition(newPosition);

@@ -47,7 +47,6 @@ public class WorkerContractResponder extends ContractNetResponder {
 
     protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
         this.worker.setBusy(true);
-        System.out.println("\n\tPus BUSY ");
         Position stationPosition = Utility.parseMessageWithPosition(accept.getContent());
         if (Utility.getVerbose()) {
             System.out.println(this.worker.getLocalName() + " got an accept!");
@@ -55,7 +54,6 @@ public class WorkerContractResponder extends ContractNetResponder {
         ACLMessage result = accept.createReply();
         result.setPerformative(ACLMessage.INFORM);
         result.setContent("IM-AT=>" + this.worker.getPosition().toString() + "--" + this.worker.getAID().getName());
-        System.out.println("\tsengding to: "+ scooterAID);
         ACLMessage message = new ACLMessage();
         message.setPerformative(ACLMessage.REQUEST);
         message.setContent("CHARGE-AT=>" + stationPosition.toString());

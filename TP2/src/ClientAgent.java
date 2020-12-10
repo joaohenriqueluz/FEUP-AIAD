@@ -122,10 +122,7 @@ public class ClientAgent extends Agent implements Drawable {
             return destination;
         }
 
-        double destinationToStation = Utility.getEuclideanDistance(destination, stationPosition); // Distance of nearest
-        // station to original
-        // destination;
-        // For money purposes
+        double destinationToStation = Utility.getEuclideanDistance(destination, stationPosition);
         double positionToDestination = Utility.getEuclideanDistance(destination, this.position);
         double positionToStation = Utility.getEuclideanDistance(stationPosition, this.position);
         double moneyLikelihood = 1;
@@ -143,20 +140,13 @@ public class ClientAgent extends Agent implements Drawable {
 
         double fitness = Math.random() * (Utility.getClientsFitnessMax() - Utility.getClientsFitnessMin())
                 + Utility.getClientsFitnessMin();
-        // double fitness = Math.random() * (1 - 0.4) + 0.4;
-        double weather = Math.random()
-                * (Utility.getWeatherConditionsMax() - Utility.getWeatherConditionsMin())
+        double weather = Math.random() * (Utility.getWeatherConditionsMax() - Utility.getWeatherConditionsMin())
                 + Utility.getWeatherConditionsMin();
-                System.out.println("\t\tCLIENT fitness: "+ fitness);
-                System.out.println("\t\tCLIENT WEATHER: "+ weather);
-        // double weather = Math.random();
         double distanceWeight = Math.random() * (0.8 - 0.50) + 0.50;
         double moneyWeight = Math.random() * (0.8 - distanceWeight) + 0.1;
-        if (monetaryIncentive == 0)
-            moneyWeight = 0;
-        double weatherWeight = destinationToStation < RepastLauncher.spaceSize * 0.01 ? 0: 1 - distanceWeight - moneyWeight;
-        double likelihoodDistance = fitness
-                * (Math.min( destinationToStation * 0.4 / (destinationToStation + 1), 1.0));
+        double weatherWeight = destinationToStation < RepastLauncher.spaceSize * 0.01 ? 0
+                : 1 - distanceWeight - moneyWeight;
+        double likelihoodDistance = fitness * (Math.min(destinationToStation * 0.4 / (destinationToStation + 1), 1.0));
         double likelihood = likelihoodDistance * distanceWeight + moneyLikelihood * moneyWeight
                 + weather * weatherWeight;
         double random = Math.random();

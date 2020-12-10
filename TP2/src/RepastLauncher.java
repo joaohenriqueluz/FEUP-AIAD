@@ -1,8 +1,5 @@
-import java.lang.reflect.Array;
-import jdk.jshell.execution.Util;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import sajas.sim.repast3.Repast3Launcher;
 import sajas.core.Agent;
@@ -13,19 +10,16 @@ import sajas.wrapper.ContainerController;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.StaleProxyException;
-import jade.lang.acl.ACLMessage;
 import uchicago.src.sim.analysis.DataRecorder;
 import uchicago.src.sim.analysis.DataSource;
 import uchicago.src.sim.analysis.OpenSequenceGraph;
 import uchicago.src.sim.analysis.Sequence;
-import uchicago.src.sim.engine.BasicAction;
 import uchicago.src.sim.engine.Schedule;
 import uchicago.src.sim.engine.SimInit;
 import uchicago.src.sim.gui.DisplaySurface;
 import uchicago.src.sim.gui.Object2DDisplay;
 import uchicago.src.sim.space.BagCell;
 import uchicago.src.sim.space.Multi2DGrid;
-import uchicago.src.sim.util.SimUtilities;
 
 public class RepastLauncher extends Repast3Launcher {
 
@@ -39,8 +33,8 @@ public class RepastLauncher extends Repast3Launcher {
     int numberOfWorkers = 1;
     private double weatherConditionsMax = 1.0;
     private double weatherConditionsMin = 0.0;
-    private double clientsFitnessMax = 1.0; // The clients' physical aptitude
-    private double clientsFitnessMin = 0.0; // The clients' physical aptitude
+    private double clientsFitnessMax = 1.0; // The clients' physical aptitude maximum value
+    private double clientsFitnessMin = 0.0; // The clients' physical aptitude minimum value
 
     public static Multi2DGrid space;
     private Schedule schedule;
@@ -117,7 +111,6 @@ public class RepastLauncher extends Repast3Launcher {
         Profile p1 = new ProfileImpl();
         ContainerController mainContainer = rt.createMainContainer(p1);
         space = new Multi2DGrid(spaceSize, spaceSize, false);
-        System.out.println("\t\tMODEL");
         recorder = new DataRecorder("./src/output/scooterPerformanceFitness_" + clientsFitnessMin + "-"
                 + clientsFitnessMax + "_Weather_" + weatherConditionsMin + "-" + weatherConditionsMax + ".csv", this);
 
@@ -184,8 +177,6 @@ public class RepastLauncher extends Repast3Launcher {
     }
 
     public void buildModel() {
-        System.out.println("\t\tMODEL");
-
         recorder.addObjectDataSource("Total Trips", new DataSource() {
             public Object execute() {
                 return companyAgent.getNumberOfTrips();
@@ -246,7 +237,6 @@ public class RepastLauncher extends Repast3Launcher {
 
     private void buildSchedule() {
         System.out.println("[BUILDING SCHEDULE]");
-        // getSchedule().scheduleActionAtInterval(500, this, "step");
         if (showDisplay) {
             getSchedule().scheduleActionAtInterval(1, dsurf, "updateDisplay", Schedule.LAST);
         }
