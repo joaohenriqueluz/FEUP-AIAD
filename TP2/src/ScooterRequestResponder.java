@@ -9,7 +9,7 @@ import java.util.TimerTask;
 class ScooterRequestResponder extends AchieveREResponder {
 
     ElectricScooterAgent scooter;
-    
+
     public ScooterRequestResponder(ElectricScooterAgent scooter, MessageTemplate mt) {
         super(scooter, mt);
         this.scooter = scooter;
@@ -31,6 +31,8 @@ class ScooterRequestResponder extends AchieveREResponder {
                 return parseGoTo(message, request);
             case "DROP":
                 return parseDrop(message, request);
+            case "CHARGE-AT":
+                return parseChargeAt(message, request);
             default:
                 break;
         }
@@ -83,4 +85,18 @@ class ScooterRequestResponder extends AchieveREResponder {
         }
         return response;
     }
+
+    private ACLMessage parseChargeAt(ArrayList<String> requestContents, ACLMessage request) {
+        System.out.println("\tFROM WORKER: " + request.getContent());
+        ACLMessage reply = request.createReply();
+        reply.setPerformative(ACLMessage.INFORM);
+        reply.setContent("Got your message!");
+        ArrayList<String> tokens = Utility.parseMessage(request.getContent());
+        Position newPosition = Utility.parseMessageWithPosition(request.getContent());
+        this.scooter.setPosition(newPosition);
+        this.scooter.setTripStartPosition(newPosition);
+        this.scooter.setBusy(false);
+        return reply;
+    }
+
 }

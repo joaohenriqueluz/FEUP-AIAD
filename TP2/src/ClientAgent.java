@@ -66,7 +66,6 @@ public class ClientAgent extends Agent implements Drawable {
         } else {
             cell.add(this);
         }
-         
     }
 
     public Position getDestination() {
@@ -142,16 +141,22 @@ public class ClientAgent extends Agent implements Drawable {
             }
         }
 
-        double fitness = Math.random() * (RepastLauncher.getClientsFitnessMax() - RepastLauncher.getClientsFitnessMin()) + RepastLauncher.getClientsFitnessMin();
+        double fitness = Math.random() * (Utility.getClientsFitnessMax() - Utility.getClientsFitnessMin())
+                + Utility.getClientsFitnessMin();
         // double fitness = Math.random() * (1 - 0.4) + 0.4;
-        double weather = Math.random() * (RepastLauncher.getWeatherConditionsMax() - RepastLauncher.getWeatherConditionsMin()) + RepastLauncher.getWeatherConditionsMin();
+        double weather = Math.random()
+                * (Utility.getWeatherConditionsMax() - Utility.getWeatherConditionsMin())
+                + Utility.getWeatherConditionsMin();
+                System.out.println("\t\tCLIENT fitness: "+ fitness);
+                System.out.println("\t\tCLIENT WEATHER: "+ weather);
         // double weather = Math.random();
         double distanceWeight = Math.random() * (0.8 - 0.50) + 0.50;
         double moneyWeight = Math.random() * (0.8 - distanceWeight) + 0.1;
         if (monetaryIncentive == 0)
             moneyWeight = 0;
-        double weatherWeight = 1 - distanceWeight - moneyWeight;
-        double likelihoodDistance = fitness * (Math.min(150 / (destinationToStation + 1), 1.0));
+        double weatherWeight = destinationToStation < RepastLauncher.spaceSize * 0.01 ? 0: 1 - distanceWeight - moneyWeight;
+        double likelihoodDistance = fitness
+                * (Math.min( destinationToStation * 0.4 / (destinationToStation + 1), 1.0));
         double likelihood = likelihoodDistance * distanceWeight + moneyLikelihood * moneyWeight
                 + weather * weatherWeight;
         double random = Math.random();

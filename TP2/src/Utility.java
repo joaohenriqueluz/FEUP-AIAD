@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Utility {
+    static double weatherConditionsMax = 1.0;
+    static double weatherConditionsMin = 0.0;
+    static double clientsFitnessMax = 1.0; // The clients' physical aptitude
+    static double clientsFitnessMin = 0.0; // The clients' physical aptitude
     private static Boolean verbose = false;
     private static ArrayList<Position> POIs = new ArrayList<Position>(
             Arrays.asList(new Position(), new Position(), new Position(), new Position(), new Position(),
@@ -100,5 +104,37 @@ public class Utility {
 
     public static ArrayList<Position> getPOIs() {
         return POIs;
+    }
+
+    public static double getWeatherConditionsMax() {
+        return weatherConditionsMax;
+    }
+
+    public static void setWeatherConditionsMax(double newWeatherConditionsMax) {
+        weatherConditionsMax = newWeatherConditionsMax;
+    }
+
+    public static double getWeatherConditionsMin() {
+        return weatherConditionsMin;
+    }
+
+    public static void setWeatherConditionsMin(double newWeatherConditionsMin) {
+        weatherConditionsMin = newWeatherConditionsMin;
+    }
+
+    public static double getClientsFitnessMax() {
+        return clientsFitnessMax;
+    }
+
+    public static void setClientsFitnessMax(double newClientsFitnessMax) {
+        clientsFitnessMax = newClientsFitnessMax;
+    }
+
+    public static double getClientsFitnessMin() {
+        return clientsFitnessMin;
+    }
+
+    public static void setClientsFitnessMin(double newClientsFitnessMin) {
+        clientsFitnessMin = newClientsFitnessMin;
     }
 }

@@ -78,6 +78,8 @@ public class CompanyWorkerContractInitiator extends ContractNetInitiator {
             this.company
                     .updateOperationCosts(bestDistance + Utility.getEuclideanDistance(nearestStation, scooterPosition));
             this.company.printTripsInfo();
+            this.company.getRecorder().record();
+            this.company.getRecorder().writeToFile();
             ((ACLMessage) acceptances.get(bestProposal)).setContent("STATION-AT=>" + nearestStation.toString());
         } else {
             ACLMessage response = this.request.createReply();

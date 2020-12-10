@@ -85,6 +85,8 @@ class CompanyRequestResponder extends SSIteratedAchieveREResponder {
                 response.setPerformative(ACLMessage.REFUSE);
                 response.setContent("Already in station, no need");
                 this.company.printTripsInfo();
+                this.company.getRecorder().record();
+                this.company.getRecorder().writeToFile();
             }
         } catch (Exception e) {
             response.setPerformative(ACLMessage.NOT_UNDERSTOOD);

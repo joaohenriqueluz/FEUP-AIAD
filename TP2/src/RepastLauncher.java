@@ -1,6 +1,8 @@
 import java.lang.reflect.Array;
 import jdk.jshell.execution.Util;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import sajas.sim.repast3.Repast3Launcher;
 import sajas.core.Agent;
@@ -35,28 +37,60 @@ public class RepastLauncher extends Repast3Launcher {
     int numberOfClients = 1;
     int numberOfScooters = 1;
     int numberOfWorkers = 1;
-    static double weatherConditionsMax = 1.0;
-    static double weatherConditionsMin = 0.0;
-    static double clientsFitnessMax = 1.0; // The clients' physical aptitude
-    static double clientsFitnessMin = 0.0; // The clients' physical aptitude
+    private double weatherConditionsMax = 1.0;
+    private double weatherConditionsMin = 0.0;
+    private double clientsFitnessMax = 1.0; // The clients' physical aptitude
+    private double clientsFitnessMin = 0.0; // The clients' physical aptitude
 
     public static Multi2DGrid space;
     private Schedule schedule;
     private DisplaySurface dsurf;
     public static int spaceSize = 150;
     private DataRecorder recorder;
+    private Boolean showPlots = false;
+    private Boolean showDisplay = false;
 
     private ArrayList<Agent> agentList;
     private CompanyAgent companyAgent;
 
     public static void main(String[] args) {
-        boolean runMode = false; // BATCH_MODE or !BATCH_MODE
-        // create a simulation
+
+        boolean batchMode = false;
         SimInit init = new SimInit();
-        // create a model
         RepastLauncher model = new RepastLauncher();
+
+        ArrayList<String> allARgs = new ArrayList<String>(Arrays.asList(args));
+        if (allARgs.size() > 0) {
+            int argIndex = 0;
+            if (allARgs.contains("-b")) {
+                batchMode = true;
+                argIndex++;
+            }
+            if (allARgs.contains("-v")) {
+                model.setVerboseFlag(true);
+                argIndex++;
+            }
+            if (allARgs.contains("-p")) {
+                model.setPoiFlag(true);
+                argIndex++;
+            }
+
+            try {
+                model.setMonetaryIncentive(Double.parseDouble(args[argIndex]));
+                model.setStaffTravelCost(Double.parseDouble(args[argIndex + 1]));
+                model.setScooterPriceRate(Double.parseDouble(args[argIndex + 2]));
+                model.setNumberOfClients(Integer.parseInt(args[argIndex + 3]));
+                model.setNumberOfScooters(Integer.parseInt(args[argIndex + 4]));
+                model.setNumberOfWorkers(Integer.parseInt(args[argIndex + 5]));
+            } catch (Exception e) {
+                System.err.println(
+                        "Incorrect command. Try:\n\tjava -cp (...) src/RepasLauncher.java [-b] [-p] [-v] <monetary_incentive> <staff_travel_cost> <scooter_price_rate> <number_of_clients> <number_of_scooter> <number_of_workers> (for batch mode)"
+                                + "\n\tjava -cp (...) src/RepasLauncher.java (for GUI mode)");
+                return;
+            }
+        }
         // load model into simulation:
-        init.loadModel(model, null, runMode);
+        init.loadModel(model, null, batchMode);
     }
 
     public RepastLauncher() {
@@ -71,25 +105,25 @@ public class RepastLauncher extends Repast3Launcher {
         schedule = new Schedule();
         if (dsurf != null)
             dsurf.dispose();
-        dsurf = new DisplaySurface(this, "Color Picking Display");
-        registerDisplaySurface("Color Picking Display", dsurf);
+        dsurf = new DisplaySurface(this, "Agents Display");
+        registerDisplaySurface("Agents Display", dsurf);
     }
 
     @Override
     public void launchJADE() {
         System.out.println("launchJADE");
-    }
-
-    protected void launchAgents() {
         System.out.println("Launching JADE");
         Runtime rt = Runtime.instance();
         Profile p1 = new ProfileImpl();
         ContainerController mainContainer = rt.createMainContainer(p1);
         space = new Multi2DGrid(spaceSize, spaceSize, false);
+        System.out.println("\t\tMODEL");
+        recorder = new DataRecorder("./src/output/scooterPerformanceFitness_" + clientsFitnessMin + "-"
+                + clientsFitnessMax + "_Weather_" + weatherConditionsMin + "-" + weatherConditionsMax + ".csv", this);
 
         try {
             companyAgent = new CompanyAgent(10, "company_0", poiFlag, monetaryIncentive, staffTravelCost,
-                    scooterPriceRate, space);
+                    scooterPriceRate, space, recorder);
             AgentController company = mainContainer.acceptNewAgent("company", companyAgent);
             company.start();
 
@@ -138,20 +172,31 @@ public class RepastLauncher extends Repast3Launcher {
         } catch (StaleProxyException e) {
             e.printStackTrace();
         }
+
     }
 
     @Override
     public void begin() {
         super.begin();
-        System.out.println("begin");
         buildModel();
         buildDisplay();
         buildSchedule();
     }
 
     public void buildModel() {
-        launchAgents();
-        recorder = new DataRecorder("./src/output/scooterPerformance.csv", this);
+        System.out.println("\t\tMODEL");
+
+        recorder.addObjectDataSource("Total Trips", new DataSource() {
+            public Object execute() {
+                return companyAgent.getNumberOfTrips();
+            }
+        });
+
+        recorder.addObjectDataSource("Total Successful Trips", new DataSource() {
+            public Object execute() {
+                return companyAgent.getNumberOfSuccessfulTrips();
+            }
+        });
         recorder.addObjectDataSource("Successful Trips Percentage", new DataSource() {
             public Object execute() {
                 return 100 * ((double) companyAgent.getNumberOfSuccessfulTrips()) / companyAgent.getNumberOfTrips();
@@ -185,25 +230,57 @@ public class RepastLauncher extends Repast3Launcher {
     private OpenSequenceGraph plotSuccessuful;
 
     private void buildDisplay() {
-        System.out.println("BuildDisplay");
-        // space and display surface
-        Object2DDisplay display = new Object2DDisplay(space);
-        display.setObjectList(agentList);
-        dsurf.addDisplayableProbeable(display, "Agents Space");
-        dsurf.display();
+        System.out.println("[BUILDING DISPLAY]");
+        if (showDisplay) {
+            // space and display surface
+            Object2DDisplay display = new Object2DDisplay(space);
+            display.setObjectList(agentList);
+            dsurf.addDisplayableProbeable(display, "Agents Space");
+            dsurf.display();
 
+        }
+        if (showPlots) {
+            buildPlots();
+        }
+    }
+
+    private void buildSchedule() {
+        System.out.println("[BUILDING SCHEDULE]");
+        // getSchedule().scheduleActionAtInterval(500, this, "step");
+        if (showDisplay) {
+            getSchedule().scheduleActionAtInterval(1, dsurf, "updateDisplay", Schedule.LAST);
+        }
+        if (showPlots) {
+            getSchedule().scheduleActionAtInterval(100, plotSuccessuful, "step", Schedule.LAST);
+            getSchedule().scheduleActionAtInterval(100, plotIncome, "step", Schedule.LAST);
+        }
+    }
+
+    private void buildPlots() {
+        System.out.println("[BUILDING PLOTS]");
         // graph
         if (plotSuccessuful != null)
             plotSuccessuful.dispose();
         plotSuccessuful = new OpenSequenceGraph("Successful Trips", this);
         plotSuccessuful.setAxisTitles("time", "% successful trips");
-        plotSuccessuful.setYRange(0, 100);
-
-        plotSuccessuful.addSequence("Successful trips", new Sequence() {
+        // plotSuccessuful.setYRange(0, 100);
+        // plotSuccessuful.addSequence("% of successful trips", new Sequence() {
+        // public double getSValue() {
+        // return 100 * ((double) companyAgent.getNumberOfSuccessfulTrips()) /
+        // companyAgent.getNumberOfTrips();
+        // }
+        // });
+        plotSuccessuful.addSequence("Total number of trips", new Sequence() {
             public double getSValue() {
-                return 100 * ((double) companyAgent.getNumberOfSuccessfulTrips()) / companyAgent.getNumberOfTrips();
+                return companyAgent.getNumberOfTrips();
             }
         });
+        plotSuccessuful.addSequence("Number of successful trips", new Sequence() {
+            public double getSValue() {
+                return companyAgent.getNumberOfSuccessfulTrips();
+            }
+        });
+
         plotSuccessuful.display();
 
         if (plotIncome != null)
@@ -231,17 +308,6 @@ public class RepastLauncher extends Repast3Launcher {
         plotIncome.display();
     }
 
-    private void buildSchedule() {
-        System.out.println("Aaaaann schedule!");
-
-        // schedule.scheduleActionBeginning(0, new MainAction());
-        getSchedule().scheduleActionAtInterval(500, this, "step");
-        getSchedule().scheduleActionAtInterval(1, dsurf, "updateDisplay", Schedule.LAST);
-        getSchedule().scheduleActionAtInterval(100, plotSuccessuful, "step", Schedule.LAST);
-        getSchedule().scheduleActionAtInterval(100, plotIncome, "step", Schedule.LAST);
-        getSchedule().scheduleActionAtPause(recorder, "writeToFile");
-    }
-
     public void step() {
         recorder.record();
     }
@@ -250,8 +316,7 @@ public class RepastLauncher extends Repast3Launcher {
     public String[] getInitParam() {
         return new String[] { "spaceSize", "poiFlag", "verboseFlag", "monetaryIncentive", "staffTravelCost",
                 "scooterPriceRate", "numberOfClients", "numberOfScooters", "numberOfWorkers", "weatherConditionsMax",
-                "weatherConditionsMin", "clientsFitnessMax", "clientsFitnessMin" };
-        // return new String[] {};
+                "weatherConditionsMin", "clientsFitnessMax", "clientsFitnessMin", "showPlots", "showDisplay" };
     }
 
     @Override
@@ -259,35 +324,43 @@ public class RepastLauncher extends Repast3Launcher {
         return "Electric Scooter Simulation";
     }
 
-    public static double getClientsFitnessMax() {
+    public double getClientsFitnessMax() {
         return clientsFitnessMax;
     }
 
-    public static void setClientsFitnessMax(double newClientsFitnessMax) {
+    public void setClientsFitnessMax(double newClientsFitnessMax) {
+        System.out.println("[Clients Fitness Max = " + newClientsFitnessMax + "]");
+        Utility.setClientsFitnessMax(newClientsFitnessMax);
         clientsFitnessMax = newClientsFitnessMax;
     }
 
-    public static double getClientsFitnessMin() {
+    public double getClientsFitnessMin() {
         return clientsFitnessMin;
     }
 
-    public static void setClientsFitnessMin(double newClientsFitnessMin) {
+    public void setClientsFitnessMin(double newClientsFitnessMin) {
+        System.out.println("[Clients Fitness Min = " + newClientsFitnessMin + "]");
+        Utility.setClientsFitnessMin(newClientsFitnessMin);
         clientsFitnessMin = newClientsFitnessMin;
     }
 
-    public static double getWeatherConditionsMax() {
+    public double getWeatherConditionsMax() {
         return weatherConditionsMax;
     }
 
-    public static void setWeatherConditionsMax(double newWeatherConditionsMax) {
+    public void setWeatherConditionsMax(double newWeatherConditionsMax) {
+        System.out.println("[Weather Conditions Max = " + newWeatherConditionsMax + "]");
+        Utility.setWeatherConditionsMax(newWeatherConditionsMax);
         weatherConditionsMax = newWeatherConditionsMax;
     }
 
-    public static double getWeatherConditionsMin() {
+    public double getWeatherConditionsMin() {
         return weatherConditionsMin;
     }
 
-    public static void setWeatherConditionsMin(double newWeatherConditionsMin) {
+    public void setWeatherConditionsMin(double newWeatherConditionsMin) {
+        System.out.println("[Weather Conditions Min = " + newWeatherConditionsMin + "]");
+        Utility.setWeatherConditionsMin(newWeatherConditionsMin);
         weatherConditionsMin = newWeatherConditionsMin;
     }
 
@@ -300,6 +373,9 @@ public class RepastLauncher extends Repast3Launcher {
     }
 
     public void setPoiFlag(Boolean poiFlag) {
+        if (poiFlag) {
+            System.out.println("[STATIONS IN POINTS OF INTEREST]");
+        }
         this.poiFlag = poiFlag;
     }
 
@@ -308,6 +384,7 @@ public class RepastLauncher extends Repast3Launcher {
     }
 
     public void setMonetaryIncentive(double monetaryIncentive) {
+        System.out.println("[Monetary Incentive = " + monetaryIncentive + "]");
         this.monetaryIncentive = monetaryIncentive;
     }
 
@@ -316,6 +393,7 @@ public class RepastLauncher extends Repast3Launcher {
     }
 
     public void setStaffTravelCost(double staffTravelCost) {
+        System.out.println("[Staff Travel Cost = " + staffTravelCost + "]");
         this.staffTravelCost = staffTravelCost;
     }
 
@@ -324,6 +402,7 @@ public class RepastLauncher extends Repast3Launcher {
     }
 
     public void setScooterPriceRate(double scooterPriceRate) {
+        System.out.println("[Scooter Price Rate = " + scooterPriceRate + "]");
         this.scooterPriceRate = scooterPriceRate;
     }
 
@@ -332,6 +411,7 @@ public class RepastLauncher extends Repast3Launcher {
     }
 
     public void setNumberOfClients(int numberOfClients) {
+        System.out.println("[Number Of Clients = " + numberOfClients + "]");
         this.numberOfClients = numberOfClients;
     }
 
@@ -340,6 +420,7 @@ public class RepastLauncher extends Repast3Launcher {
     }
 
     public void setNumberOfScooters(int numberOfScooters) {
+        System.out.println("[Number Of Scooters = " + numberOfScooters + "]");
         this.numberOfScooters = numberOfScooters;
     }
 
@@ -348,6 +429,7 @@ public class RepastLauncher extends Repast3Launcher {
     }
 
     public void setNumberOfWorkers(int numberOfWorkers) {
+        System.out.println("[Number Of Workers = " + numberOfWorkers + "]");
         this.numberOfWorkers = numberOfWorkers;
     }
 
@@ -372,7 +454,46 @@ public class RepastLauncher extends Repast3Launcher {
     }
 
     public void setVerboseFlag(Boolean verboseFlag) {
+        if (verboseFlag) {
+            System.out.println("[VERBOSE MODE]");
+        } else {
+            System.out.println("[NON VERBOSE MODE]");
+        }
         this.verboseFlag = verboseFlag;
         Utility.setVerbose(verboseFlag);
+    }
+
+    public Boolean isShowPlots() {
+        return this.showPlots;
+    }
+
+    public Boolean getShowPlots() {
+        return this.showPlots;
+    }
+
+    public void setShowPlots(Boolean showPlots) {
+        if (showPlots) {
+            System.out.println("[SHOW PLOTS ON]");
+        } else {
+            System.out.println("[SHOW PLOTS OFF]");
+        }
+        this.showPlots = showPlots;
+    }
+
+    public Boolean isShowDisplay() {
+        return this.showDisplay;
+    }
+
+    public Boolean getShowDisplay() {
+        return this.showDisplay;
+    }
+
+    public void setShowDisplay(Boolean showDisplay) {
+        if (showDisplay) {
+            System.out.println("[SHOW DISPLAY ON]");
+        } else {
+            System.out.println("[SHOW DISPLAY OFF]");
+        }
+        this.showDisplay = showDisplay;
     }
 }

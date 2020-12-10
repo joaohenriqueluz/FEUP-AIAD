@@ -34,18 +34,7 @@ class RequestPickUpInitiator extends AchieveREInitiator {
 
     protected void handleInform(ACLMessage inform) {
         Utility.log(this.scooter, inform);
-        ACLMessage msg = this.scooter.receive();
-        if (msg != null && msg.getContent() != null) {
-            ACLMessage reply = msg.createReply();
-            reply.setPerformative(ACLMessage.INFORM);
-            reply.setContent("Got your message!");
-            this.scooter.send(reply);
-            ArrayList<String> tokens = Utility.parseMessage(msg.getContent());
-            Position newPosition = Utility.parseMessageWithPosition(msg.getContent());
-            this.scooter.setPosition(newPosition);
-            this.scooter.setTripStartPosition(newPosition);
-            this.scooter.setBusy(false);
-        }
+        System.out.println("\tREQUEST PICKUP INFORM: "+ inform.getContent());
     }
 
     protected void handleFailure(ACLMessage failure) {

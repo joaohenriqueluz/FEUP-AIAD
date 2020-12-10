@@ -3,6 +3,7 @@ import sajas.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import sajas.proto.SSResponderDispatcher;
+import uchicago.src.sim.analysis.DataRecorder;
 import uchicago.src.sim.space.BagCell;
 import uchicago.src.sim.space.Multi2DGrid;
 
@@ -21,9 +22,10 @@ public class CompanyAgent extends Agent {
     private double netIncome;
     private double operationCosts;
     Multi2DGrid space;
+    private DataRecorder recorder;
 
     public CompanyAgent(int numberOfStations, String name, Boolean stationAtPOIs, Double monetaryIncentive,
-            Double staffTravelCost, Double scooterPriceRate, Multi2DGrid space) {
+            Double staffTravelCost, Double scooterPriceRate, Multi2DGrid space, DataRecorder recorder) {
         this.companyName = name;
         this.numberOfSuccessfulTrips = 0;
         this.numberOfTrips = 0;
@@ -33,6 +35,7 @@ public class CompanyAgent extends Agent {
         this.scooterPriceRate = scooterPriceRate;
         this.staffTravelCost = staffTravelCost;
         this.space = space;
+        this.recorder = recorder;
         chargingStationPositions = new ArrayList<Position>();
 
         if (stationAtPOIs) {
@@ -158,6 +161,14 @@ public class CompanyAgent extends Agent {
         return netIncome - operationCosts;
     }
 
+    public DataRecorder getRecorder() {
+        return this.recorder;
+    }
+
+    public void setRecorder(DataRecorder recorder) {
+        this.recorder = recorder;
+    }
+
     public void printTripsInfo() {
         System.out.println("----------------------------------------------------------");
         System.out.println("Number of successful trips: " + numberOfSuccessfulTrips);
@@ -199,5 +210,6 @@ public class CompanyAgent extends Agent {
 
     public void takeDown() {
         System.out.println("** " + getLocalName() + ": done working. **");
+        this.recorder.writeToFile();
     }
 }
