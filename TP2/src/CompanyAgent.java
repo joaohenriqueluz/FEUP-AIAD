@@ -21,6 +21,8 @@ public class CompanyAgent extends Agent {
     private double monetaryIncentive;
     private double netIncome;
     private double operationCosts;
+    private double totalScooterDistance;
+    private double totalWorkerDistance;
     Multi2DGrid space;
     private DataRecorder recorder;
 
@@ -103,11 +105,13 @@ public class CompanyAgent extends Agent {
 
     public synchronized void updateNetIncome(double distance) {
         this.netIncome += distance * scooterPriceRate;
+        setTotalScooterDistance(totalScooterDistance + distance);
         updateNumberOfTrips(1);
     }
 
     public synchronized void updateNetIncomeWithoutIncentive(double distance) {
         this.netIncome += distance * scooterPriceRate - monetaryIncentive;
+        setTotalScooterDistance(totalScooterDistance + distance);
         updateNumberOfSuccessfulTrips(1);
         updateNumberOfTrips(1);
     }
@@ -117,6 +121,7 @@ public class CompanyAgent extends Agent {
     }
 
     public synchronized void updateOperationCosts(double distance) {
+        setTotalWorkerDistance(totalWorkerDistance + distance);
         this.operationCosts += distance * staffTravelCost;
     }
 
@@ -169,6 +174,22 @@ public class CompanyAgent extends Agent {
         this.recorder = recorder;
     }
 
+    public double getTotalScooterDistance() {
+        return this.totalScooterDistance;
+    }
+
+    public void setTotalScooterDistance(double totalScooterDistance) {
+        this.totalScooterDistance = totalScooterDistance;
+    }
+
+    public double getTotalWorkerDistance() {
+        return this.totalWorkerDistance;
+    }
+
+    public void setTotalWorkerDistance(double totalWorkerDistance) {
+        this.totalWorkerDistance = totalWorkerDistance;
+    }
+
     public void printTripsInfo() {
         System.out.println("----------------------------------------------------------");
         System.out.println("Number of successful trips: " + numberOfSuccessfulTrips);
@@ -211,5 +232,13 @@ public class CompanyAgent extends Agent {
     public void takeDown() {
         System.out.println("** " + getLocalName() + ": done working. **");
         this.recorder.writeToFile();
+    }
+
+    public ArrayList<StationDrawableAgent> getStationDrawblesAgents() {
+        ArrayList<StationDrawableAgent> array = new ArrayList<StationDrawableAgent>();
+        for (Position stationPosition : chargingStationPositions) {
+            array.add(new StationDrawableAgent(stationPosition, space));
+        }
+        return array;
     }
 }

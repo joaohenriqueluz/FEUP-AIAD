@@ -58,4 +58,6 @@ public class CompanyScooterContractResponder extends ContractNetResponder {
         return result;
     }
 
+    
+
 }

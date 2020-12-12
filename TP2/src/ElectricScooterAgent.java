@@ -58,21 +58,23 @@ public class ElectricScooterAgent extends Agent implements Drawable {
     }
 
     public void setPosition(Position newPosition) {
-        System.out.println("** " + getLocalName() + " new position is " + position.toString() + " **");
-        BagCell cell = (BagCell) space.getCellAt(this.position.getX(), this.position.getY());
-        cell.remove(this);
-        space.putObjectAt(this.position.getX(), this.position.getY(), cell);
+        // System.out.println("** " + getLocalName() + " new position is " + position.toString() + " **");
+        // BagCell cell = (BagCell) space.getCellAt(this.position.getX(), this.position.getY());
+        // cell.remove(this);
+        // space.putObjectAt(this.position.getX(), this.position.getY(), cell);
+        // this.position = newPosition;
+        // cell = (BagCell) space.getCellAt(this.position.getX(), this.position.getY());
+        // if (cell == null) {
+        //     cell = new BagCell();
+        //     cell.add(this);
+        //     space.putObjectAt(this.position.getX(), this.position.getY(), cell); // not multi-space (only 1 agent per
+        //                                                                          // cell)
+        // } else {
+        //     cell.add(this);
+        // }
+        space.removeObjectAt(this.position.getX(), this.position.getY(), this);
         this.position = newPosition;
-        cell = (BagCell) space.getCellAt(this.position.getX(), this.position.getY());
-        if (cell == null) {
-            cell = new BagCell();
-            cell.add(this);
-            space.putObjectAt(this.position.getX(), this.position.getY(), cell); // not multi-space (only 1 agent per
-                                                                                 // cell)
-        } else {
-            cell.add(this);
-        }
-         
+        space.putObjectAt(this.position.getX(), this.position.getY(), this);
     }
 
     public Position getTripStartPosition() {

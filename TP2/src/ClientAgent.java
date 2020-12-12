@@ -7,13 +7,6 @@ import uchicago.src.sim.gui.Drawable;
 import uchicago.src.sim.gui.SimGraphics;
 
 import java.awt.Color;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.awt.Toolkit;
-
-import javax.imageio.ImageIO;
 
 public class ClientAgent extends Agent implements Drawable {
 
@@ -53,19 +46,22 @@ public class ClientAgent extends Agent implements Drawable {
 
     public void setPosition(Position newPosition) {
         System.out.println("** " + getLocalName() + " new position is " + newPosition.toString() + " **");
-        BagCell cell = (BagCell) space.getCellAt(this.position.getX(), this.position.getY());
-        cell.remove(this);
-        space.putObjectAt(this.position.getX(), this.position.getY(), cell);
+        // BagCell cell = (BagCell) space.getCellAt(this.position.getX(), this.position.getY());
+        // cell.remove(this);
+        // space.putObjectAt(this.position.getX(), this.position.getY(), cell);
+        // this.position = newPosition;
+        // cell = (BagCell) space.getCellAt(this.position.getX(), this.position.getY());
+        // if (cell == null) {
+        //     cell = new BagCell();
+        //     cell.add(this);
+        //     space.putObjectAt(this.position.getX(), this.position.getY(), cell); // not multi-space (only 1 agent per
+        //                                                                          // cell)
+        // } else {
+        //     cell.add(this);
+        // }
+        space.removeObjectAt(this.position.getX(), this.position.getY(), this);
         this.position = newPosition;
-        cell = (BagCell) space.getCellAt(this.position.getX(), this.position.getY());
-        if (cell == null) {
-            cell = new BagCell();
-            cell.add(this);
-            space.putObjectAt(this.position.getX(), this.position.getY(), cell); // not multi-space (only 1 agent per
-                                                                                 // cell)
-        } else {
-            cell.add(this);
-        }
+        space.putObjectAt(this.position.getX(), this.position.getY(), this);
     }
 
     public Position getDestination() {

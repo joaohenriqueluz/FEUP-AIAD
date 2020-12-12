@@ -68,7 +68,6 @@ class CompanyRequestResponder extends SSIteratedAchieveREResponder {
         Position scooterPosition = Utility.parsePosition(requestContents.get(1));
         double scooterDistance = Double.parseDouble(requestContents.get(2));
         String scooterAID = requestContents.get(3);
-        double tripPrice = 0;
         ACLMessage message = new ACLMessage(ACLMessage.CFP);
         message.setContent("GET-WORKER=>" + scooterPosition.toString() + "--" + scooterAID);
         ACLMessage response = request.createReply();

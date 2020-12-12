@@ -1,3 +1,5 @@
+import java.awt.Dimension;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -37,7 +39,6 @@ public class RepastLauncher extends Repast3Launcher {
     private double clientsFitnessMin = 0.0; // The clients' physical aptitude minimum value
 
     public static Multi2DGrid space;
-    private Schedule schedule;
     private DisplaySurface dsurf;
     public static int spaceSize = 150;
     private DataRecorder recorder;
@@ -96,11 +97,28 @@ public class RepastLauncher extends Repast3Launcher {
     public void setup() {
         super.setup();
         System.out.println("setup");
-        schedule = new Schedule();
         if (dsurf != null)
             dsurf.dispose();
-        dsurf = new DisplaySurface(this, "Agents Display");
-        registerDisplaySurface("Agents Display", dsurf);
+        // dsurf = new DisplaySurface(new Dimension(spaceSize * 2, spaceSize * 2), this,
+        // "Scooter Sim Display");
+        dsurf = new DisplaySurface(this, "Scooter Sim Display");
+        registerDisplaySurface("Scooter Sim Display", dsurf);
+    }
+
+    public String getFileName(){
+        String filename = "./src/output/";
+        if(poiFlag){
+           filename += "POI_";
+        }else{
+            filename += "RANDOM_";
+        }
+        filename += monetaryIncentive + "_";
+        filename += scooterPriceRate + "_";
+        filename += staffTravelCost +".csv";
+        return filename;
+
+        // "./src/output/scooterPerformanceFitness_" + clientsFitnessMin + "-"
+        //         + clientsFitnessMax + "_Weather_" + weatherConditionsMin + "-" + weatherConditionsMax + ".csv"
     }
 
     @Override
@@ -111,14 +129,34 @@ public class RepastLauncher extends Repast3Launcher {
         Profile p1 = new ProfileImpl();
         ContainerController mainContainer = rt.createMainContainer(p1);
         space = new Multi2DGrid(spaceSize, spaceSize, false);
-        recorder = new DataRecorder("./src/output/scooterPerformanceFitness_" + clientsFitnessMin + "-"
-                + clientsFitnessMax + "_Weather_" + weatherConditionsMin + "-" + weatherConditionsMax + ".csv", this);
+        recorder = new DataRecorder(getFileName(), this);
 
         try {
             companyAgent = new CompanyAgent(10, "company_0", poiFlag, monetaryIncentive, staffTravelCost,
                     scooterPriceRate, space, recorder);
             AgentController company = mainContainer.acceptNewAgent("company", companyAgent);
             company.start();
+            // StationDrawableAgent stationDA1 = new StationDrawableAgent(new Position(0, 0), space);
+            // space.putObjectAt(stationDA1.getX(), stationDA1.getY(), stationDA1);
+            // agentList.add(stationDA1);
+
+            // StationDrawableAgent stationDA2 = new StationDrawableAgent(new Position(1, 1), space);
+            // space.putObjectAt(stationDA2.getX(), stationDA2.getY(), stationDA2);
+            // agentList.add(stationDA2);
+
+            // StationDrawableAgent stationDA3 = new StationDrawableAgent(new Position((spaceSize / 2), (spaceSize / 2)),
+            //         space, new Color(255, 0, 0));
+            // space.putObjectAt(stationDA3.getX(), stationDA3.getY(), stationDA3);
+            // agentList.add(stationDA3);
+
+            // StationDrawableAgent stationDA4 = new StationDrawableAgent(new Position(0, (spaceSize / 2)), space,
+            //         new Color(255, 0, 0));
+            // space.putObjectAt(stationDA4.getX(), stationDA4.getY(), stationDA4);
+            // agentList.add(stationDA4);
+
+            // for (Agent stationDrawableAgent : companyAgent.getStationDrawblesAgents()) {
+            //     agentList.add(stationDrawableAgent);
+            // }
 
             ArrayList<Position> stationPositions = companyAgent.getChargingStationPositions();
             for (int i = 0; i < numberOfScooters; i++) {
@@ -126,10 +164,6 @@ public class RepastLauncher extends Repast3Launcher {
                 ElectricScooterAgent electricScooterAgent = new ElectricScooterAgent(name,
                         stationPositions.get(i % stationPositions.size()), space);
                 AgentController electricScooter = mainContainer.acceptNewAgent(name, electricScooterAgent);
-                BagCell cell = new BagCell();
-                cell.add(electricScooterAgent);
-                space.putObjectAt(electricScooterAgent.getPosition().getX(), electricScooterAgent.getPosition().getY(),
-                        cell);
                 agentList.add(electricScooterAgent);
                 electricScooter.start();
             }
@@ -138,9 +172,6 @@ public class RepastLauncher extends Repast3Launcher {
                 String name = "client_" + i;
                 ClientAgent clientAgent = new ClientAgent(name, space);
                 AgentController client = mainContainer.acceptNewAgent(name, clientAgent);
-                BagCell cell = new BagCell();
-                cell.add(clientAgent);
-                space.putObjectAt(clientAgent.getPosition().getX(), clientAgent.getPosition().getY(), cell);
                 agentList.add(clientAgent);
                 client.start();
             }
@@ -155,9 +186,6 @@ public class RepastLauncher extends Repast3Launcher {
                     workerAgent = new WorkerAgent(name, space);
                 }
                 worker = mainContainer.acceptNewAgent(name, workerAgent);
-                BagCell cell = new BagCell();
-                cell.add(workerAgent);
-                space.putObjectAt(workerAgent.getPosition().getX(), workerAgent.getPosition().getY(), cell);
                 agentList.add(workerAgent);
                 worker.start();
             }
@@ -215,6 +243,18 @@ public class RepastLauncher extends Repast3Launcher {
                 return companyAgent.getProfit();
             }
         });
+
+        recorder.addObjectDataSource("Total Scooter Distance", new DataSource() {
+            public Object execute() {
+                return companyAgent.getTotalScooterDistance();
+            }
+        });
+
+        recorder.addObjectDataSource("Total Worker Distance", new DataSource() {
+            public Object execute() {
+                return companyAgent.getTotalWorkerDistance();
+            }
+        });
     }
 
     private OpenSequenceGraph plotIncome;
@@ -228,7 +268,6 @@ public class RepastLauncher extends Repast3Launcher {
             display.setObjectList(agentList);
             dsurf.addDisplayableProbeable(display, "Agents Space");
             dsurf.display();
-
         }
         if (showPlots) {
             buildPlots();
@@ -304,8 +343,8 @@ public class RepastLauncher extends Repast3Launcher {
 
     @Override
     public String[] getInitParam() {
-        return new String[] { "spaceSize", "poiFlag", "verboseFlag", "monetaryIncentive", "staffTravelCost",
-                "scooterPriceRate", "numberOfClients", "numberOfScooters", "numberOfWorkers", "weatherConditionsMax",
+        return new String[] { "poiFlag", "verboseFlag", "monetaryIncentive", "staffTravelCost", "scooterPriceRate",
+                "numberOfClients", "numberOfScooters", "numberOfWorkers", "weatherConditionsMax",
                 "weatherConditionsMin", "clientsFitnessMax", "clientsFitnessMin", "showPlots", "showDisplay" };
     }
 
@@ -433,6 +472,7 @@ public class RepastLauncher extends Repast3Launcher {
 
     public void setSpaceSize(int newSpaceSize) {
         spaceSize = newSpaceSize;
+        System.out.println("space size is " + spaceSize);
     }
 
     public Boolean isVerboseFlag() {
