@@ -141,6 +141,11 @@ public class RepastLauncher extends Repast3Launcher {
                 agentList.add(stationDrawableAgent);
             }
 
+            for (Position poiPosition : Utility.getPOIs()) {
+                // osition position, Multi2DGrid space, Color color, Boolean isItstati
+                agentList.add(new StationDrawableAgent(poiPosition,space,new Color(255,255,0), false));
+            }
+
             ArrayList<Position> stationPositions = companyAgent.getChargingStationPositions();
             for (int i = 0; i < numberOfScooters; i++) {
                 String name = "electricScooter_" + i;
@@ -456,7 +461,6 @@ public class RepastLauncher extends Repast3Launcher {
 
     public void setSpaceSize(int newSpaceSize) {
         spaceSize = newSpaceSize;
-        System.out.println("space size is " + spaceSize);
     }
 
     public Boolean isVerboseFlag() {

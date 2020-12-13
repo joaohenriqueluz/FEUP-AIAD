@@ -239,7 +239,7 @@ public class CompanyAgent extends Agent {
     public ArrayList<StationDrawableAgent> getStationDrawblesAgents() {
         ArrayList<StationDrawableAgent> array = new ArrayList<StationDrawableAgent>();
         for (Position stationPosition : chargingStationPositions) {
-            array.add(new StationDrawableAgent(stationPosition, space));
+            array.add(new StationDrawableAgent(stationPosition, space,new Color(255, 255, 255),true));
         }
         return array;
     }
