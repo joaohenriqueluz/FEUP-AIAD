@@ -8,6 +8,8 @@ import uchicago.src.sim.space.BagCell;
 import uchicago.src.sim.space.Multi2DGrid;
 
 import java.util.ArrayList;
+import java.awt.Color;
+
 
 public class CompanyAgent extends Agent {
 

@@ -19,7 +19,7 @@ import uchicago.src.sim.analysis.Sequence;
 import uchicago.src.sim.engine.Schedule;
 import uchicago.src.sim.engine.SimInit;
 import uchicago.src.sim.gui.DisplaySurface;
-import uchicago.src.sim.gui.Object2DDisplay;
+import uchicago.src.sim.gui.MultiObject2DDisplay;
 import uchicago.src.sim.space.BagCell;
 import uchicago.src.sim.space.Multi2DGrid;
 
@@ -40,10 +40,10 @@ public class RepastLauncher extends Repast3Launcher {
 
     public static Multi2DGrid space;
     private DisplaySurface dsurf;
-    public static int spaceSize = 150;
+    public static int spaceSize = 100;
     private DataRecorder recorder;
     private Boolean showPlots = false;
-    private Boolean showDisplay = false;
+    private Boolean showDisplay = true;
 
     private ArrayList<Agent> agentList;
     private CompanyAgent companyAgent;
@@ -136,27 +136,10 @@ public class RepastLauncher extends Repast3Launcher {
                     scooterPriceRate, space, recorder);
             AgentController company = mainContainer.acceptNewAgent("company", companyAgent);
             company.start();
-            // StationDrawableAgent stationDA1 = new StationDrawableAgent(new Position(0, 0), space);
-            // space.putObjectAt(stationDA1.getX(), stationDA1.getY(), stationDA1);
-            // agentList.add(stationDA1);
 
-            // StationDrawableAgent stationDA2 = new StationDrawableAgent(new Position(1, 1), space);
-            // space.putObjectAt(stationDA2.getX(), stationDA2.getY(), stationDA2);
-            // agentList.add(stationDA2);
-
-            // StationDrawableAgent stationDA3 = new StationDrawableAgent(new Position((spaceSize / 2), (spaceSize / 2)),
-            //         space, new Color(255, 0, 0));
-            // space.putObjectAt(stationDA3.getX(), stationDA3.getY(), stationDA3);
-            // agentList.add(stationDA3);
-
-            // StationDrawableAgent stationDA4 = new StationDrawableAgent(new Position(0, (spaceSize / 2)), space,
-            //         new Color(255, 0, 0));
-            // space.putObjectAt(stationDA4.getX(), stationDA4.getY(), stationDA4);
-            // agentList.add(stationDA4);
-
-            // for (Agent stationDrawableAgent : companyAgent.getStationDrawblesAgents()) {
-            //     agentList.add(stationDrawableAgent);
-            // }
+            for (Agent stationDrawableAgent : companyAgent.getStationDrawblesAgents()) {
+                agentList.add(stationDrawableAgent);
+            }
 
             ArrayList<Position> stationPositions = companyAgent.getChargingStationPositions();
             for (int i = 0; i < numberOfScooters; i++) {
@@ -264,10 +247,11 @@ public class RepastLauncher extends Repast3Launcher {
         System.out.println("[BUILDING DISPLAY]");
         if (showDisplay) {
             // space and display surface
-            Object2DDisplay display = new Object2DDisplay(space);
+            MultiObject2DDisplay display = new MultiObject2DDisplay(space);
             display.setObjectList(agentList);
+            display.reSize(spaceSize*2, spaceSize*2);
             dsurf.addDisplayableProbeable(display, "Agents Space");
-            dsurf.display();
+            dsurf.display();         
         }
         if (showPlots) {
             buildPlots();

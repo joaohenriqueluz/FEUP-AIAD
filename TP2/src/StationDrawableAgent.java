@@ -11,6 +11,13 @@ public class StationDrawableAgent extends Agent implements Drawable {
     Multi2DGrid space;
     Color color;
 
+    public Color getColor() {
+        return this.color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
 
     public StationDrawableAgent(Position position, Multi2DGrid space) {
         this.position = position;
@@ -26,9 +33,12 @@ public class StationDrawableAgent extends Agent implements Drawable {
 
     @Override
     public void draw(SimGraphics g) {
-        g.drawOval(this.color); 
-        g.setXScale(3);
-        g.setYScale(3);
+        int number = this.space.getObjectsAt(this.getX(), this.getY()).size();
+        g.setXScale(2*number);
+        g.setYScale(2*number);
+        g.drawHollowFastOval(this.color);
+        g.setXScale(2*1);
+        g.setYScale(2*1);
     }
 
     @Override
